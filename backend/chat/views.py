@@ -127,7 +127,7 @@ class MessagesViewset(viewsets.ViewSet):
                 )
 
                 return Response(status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None) -> Response:
         try:
