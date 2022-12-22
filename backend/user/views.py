@@ -11,7 +11,7 @@ class UserHistoryCallViewset(viewsets.ViewSet):
     def list(self, request) -> Response:
         queryset = UserHistoryCallModel.objects.filter(from_user=request.user) | \
                    UserHistoryCallModel.objects.filter(to_user=request.user)
-        serializer = UserHistoryCallSerializer(data=queryset, many=True)
+        serializer = UserHistoryCallSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request) -> Response:
@@ -30,13 +30,15 @@ class UserHistoryCallViewset(viewsets.ViewSet):
                 from_user=request.user, to_user=user
             )
 
-    def partial_update(self, request) -> Response:
+            return Response(status=status.HTTP_201_CREATED)
+
+    def partial_update(self, request, pk=None) -> Response:
         try:
             denied_request_is_invalid = 'denied' not in request.data or type(request.data['denied']) != bool
             if denied_request_is_invalid:
                 raise ValueError()
 
-            call_history = UserHistoryCallModel.objects.get(from_user=request.user)
+            call_history = UserHistoryCallModel.objects.get(from_user=request.user, pk=pk)
 
             if call_history.already_updated:
                 raise PermissionError()
@@ -53,7 +55,7 @@ class UserHistoryCallViewset(viewsets.ViewSet):
                 'end': timezone.now()
             }
 
-            serializer = UserHistoryCallSerializer(data=new_data, partial=True)
+            serializer = UserHistoryCallSerializer(call_history, data=new_data, partial=True)
 
             if serializer.is_valid():
                 serializer.save()

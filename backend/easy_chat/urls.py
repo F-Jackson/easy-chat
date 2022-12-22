@@ -1,17 +1,16 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from rest_framework import routers
 
 from chat.views import ChatsViewset, MessagesViewset
 from user.views import UserHistoryCallViewset
 
-router = routers.SimpleRouter()
+router = routers.DefaultRouter()
 router.register('chats', ChatsViewset, basename='chats')
 router.register('messages', MessagesViewset, basename='messages')
-router.register('call_history', UserHistoryCallViewset, basename='callHistory')
+router.register('call-history', UserHistoryCallViewset, basename='callHistory')
 
 urlpatterns = [
-    path('admin/', admin.site.urls)
+    path('admin/', admin.site.urls),
+    path('', include(router.urls))
 ]
-
-urlpatterns += router.urls
