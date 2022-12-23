@@ -13,7 +13,6 @@ class ClientTokenLogin:
         try:
             self._client_token = JwtAuthApi.create_news_tokens(self._user_id)
         except ValueError:
-            print("value")
             self._client_token = None
         else:
             return self._client_token is not None

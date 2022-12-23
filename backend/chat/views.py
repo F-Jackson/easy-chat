@@ -7,19 +7,30 @@ from chat.models import ChatModel, MessagesModel
 from chat.serializers import ChatSerializer, MessageSerializer
 from django.contrib.auth.models import User
 
+from jwt_auth.user_auth import verify_user_auth
+
 
 class ChatsViewset(viewsets.ViewSet):
-    def get_permissions(self):
-        if self.action == 'destroy':
-            permission_classes = [IsAdminUser]
-        else:
-            permission_classes = [IsAuthenticated]
-        return [permission() for permission in permission_classes]
-
     def list(self, request) -> Response:
-        queryset = ChatModel.objects.filter(user_1_id=request.user) | ChatModel.objects.filter(user_2_id=request.user)
-        serializer = ChatSerializer(queryset, many=True)
-        return Response(serializer.data)
+        def func(user, data):
+            queryset = ChatModel.objects.filter(user_1_id=user) | ChatModel.objects.filter(user_2_id=user)
+            serializer = ChatSerializer(queryset, many=True)
+
+            data.update(serializer.data)
+        return auth(request, False, func)
+        # jwt_is_valid = verify_user_auth(request, True)
+        #
+        # if jwt_is_valid:
+        #     token, user = jwt_is_valid
+        #
+        #     data = {
+        #         'token': token
+        #     }
+        #
+        #
+        #
+        #     return Response(data, status=status.HTTP_200_OK)
+        # return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request) -> Response:
         user_2 = User.objects.get(id=request.data['send_to'])
@@ -137,3 +148,22 @@ class MessagesViewset(viewsets.ViewSet):
         else:
             message.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def auth(request, get_user, func):
+    jwt_is_valid = verify_user_auth(request, True)
+
+    if jwt_is_valid:
+        token, user = jwt_is_valid
+
+        data = {
+            'token': token
+        }
+
+        if get_user:
+            data.update(func(user, data))
+        else:
+            data.update(func(data))
+
+        return Response(data, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
