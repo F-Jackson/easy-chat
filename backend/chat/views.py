@@ -1,65 +1,54 @@
 import rsa
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
+from chat.logic.chat import get_chat_info, create_new_chat, destroy_chat
 from chat.models import ChatModel, MessagesModel
-from chat.serializers import ChatSerializer, MessageSerializer
-from django.contrib.auth.models import User
+from chat.serializers import MessageSerializer
 
 from jwt_auth.user_auth import verify_user_auth
+from user.logic._common import invalid_token
 
 
 class ChatsViewset(viewsets.ViewSet):
     def list(self, request) -> Response:
-        def func(user, data):
-            queryset = ChatModel.objects.filter(user_1_id=user) | ChatModel.objects.filter(user_2_id=user)
-            serializer = ChatSerializer(queryset, many=True)
+        jwt_is_valid = verify_user_auth(request, True)
 
-            data.update(serializer.data)
-        return auth(request, False, func)
-        # jwt_is_valid = verify_user_auth(request, True)
-        #
-        # if jwt_is_valid:
-        #     token, user = jwt_is_valid
-        #
-        #     data = {
-        #         'token': token
-        #     }
-        #
-        #
-        #
-        #     return Response(data, status=status.HTTP_200_OK)
-        # return Response(status=status.HTTP_400_BAD_REQUEST)
+        if jwt_is_valid:
+            token, user = jwt_is_valid
+
+            data = {
+                'token': token
+            }
+
+            return get_chat_info(data, user)
+        return invalid_token()
 
     def create(self, request) -> Response:
-        user_2 = User.objects.get(id=request.data['send_to'])
-        pub_key, priv_key = rsa.newkeys(512)
-        data_to_valid = {
-            'pub_key': pub_key,
-            'priv_key': priv_key,
-            'user_1_id': request.user.pk,
-            'user_2_id': user_2.pk,
-        }
-        serializer = ChatSerializer(data=data_to_valid)
-        if serializer.is_valid():
-            chat = ChatModel.objects.create(
-                pub_key=pub_key,
-                priv_key=priv_key,
-                user_1_id=request.user,
-                user_2_id=user_2
-            )
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        jwt_is_valid = verify_user_auth(request, True)
+
+        if jwt_is_valid:
+            token, user = jwt_is_valid
+
+            data = {
+                'token': token
+            }
+
+            return create_new_chat(data, request.data, user)
+        return invalid_token()
 
     def destroy(self, request, pk=None) -> Response:
-        try:
-            chat = ChatModel.objects.get(pk=pk)
-        except ChatModel.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        else:
-            chat.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        jwt_is_valid = verify_user_auth(request, True)
+
+        if jwt_is_valid:
+            token, user = jwt_is_valid
+
+            data = {
+                'token': token
+            }
+
+            return destroy_chat(data, pk)
+        return invalid_token()
 
 
 class MessagesViewset(viewsets.ViewSet):
@@ -148,22 +137,3 @@ class MessagesViewset(viewsets.ViewSet):
         else:
             message.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-def auth(request, get_user, func):
-    jwt_is_valid = verify_user_auth(request, True)
-
-    if jwt_is_valid:
-        token, user = jwt_is_valid
-
-        data = {
-            'token': token
-        }
-
-        if get_user:
-            data.update(func(user, data))
-        else:
-            data.update(func(data))
-
-        return Response(data, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
