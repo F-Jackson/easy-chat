@@ -3,9 +3,9 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
 
+from chat.logic._common import send_error
 from chat.models import ChatModel
 from chat.serializers import ChatSerializer
-from user.logic._common import send_error
 
 
 def get_chat_info(data: dict, user: User) -> Response:
