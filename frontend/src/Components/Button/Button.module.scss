@@ -1,0 +1,26 @@
+.button {
+    height: 35px;
+    min-width: 35px;
+    padding: 3px 5px;
+
+    background-color: rgb(133, 0, 0);
+    border: 2px solid rgb(133, 0, 0);
+    color: white;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    overflow: hidden;
+    transition: .1s;
+
+    svg {
+        height: 90%;
+        width: 90%;
+    }
+
+    &--clicked {
+        color: transparent;
+        transform: scaleX(0.15);
+    }
+}
