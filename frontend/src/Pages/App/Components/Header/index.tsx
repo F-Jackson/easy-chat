@@ -6,14 +6,17 @@ import UserForm from "./Components/UserForm";
 import { useState } from "react";
 import classNames from "classnames";
 import { TbMessageDots } from "react-icons/tb"
+import { useRecoilValue } from "recoil";
+import { jwtTokenAtom } from "../../../../States/user";
 
 export default function Header() {
     const [sideMenuState, setSideMenuState] = useState(false);
 
+    const jwtTokenState = useRecoilValue(jwtTokenAtom);
+
     function openSideMenu() {
         setSideMenuState((_) => !sideMenuState)
     }
-
 
     return (
         <>
@@ -40,10 +43,7 @@ export default function Header() {
                         <TbMessageDots />
                     </Button>
                 </div>
-                <div>
-                    <UserForm />
-                </div>
-                <Chats />
+                { jwtTokenState ? <Chats /> : <UserForm /> }
             </aside>
         </>
     );

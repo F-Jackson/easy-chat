@@ -1,7 +1,11 @@
+import { useState } from "react";
 import Button from "../../../../../../Components/Button";
 import Input from "../../../../../../Components/Input";
 
 export default function SendMessage() {
+    const [messageState, setMessageState] = useState("");
+
+
     return (
         <section>
             <form>
@@ -10,6 +14,8 @@ export default function SendMessage() {
                     name="message"
                     placeholder="....."
                     title="Send message"
+                    value={messageState}
+                    setValue={setMessageState}
                 />
             </form>
             <Button 

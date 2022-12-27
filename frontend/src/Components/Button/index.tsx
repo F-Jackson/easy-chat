@@ -22,7 +22,7 @@ export default function Button(props: Props) {
 
         timeOutId = setTimeout(() => {
             setClickedState((_) => false)
-        }, 600)
+        }, 300)
     }
 
 

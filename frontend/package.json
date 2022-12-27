@@ -20,6 +20,7 @@
     "recoil": "^0.7.6",
     "typed-scss-modules": "^7.0.1",
     "typescript-plugin-css-modules": "^4.1.1",
+    "use-long-press": "^2.0.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

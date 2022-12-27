@@ -22,6 +22,10 @@
     }
 }
 
+label {
+    display: none;
+}
+
 @keyframes entry{
     0% {
         border-bottom: 3px solid transparent;

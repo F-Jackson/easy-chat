@@ -6,7 +6,9 @@ interface Props {
     name: string,
     label?: string,
     placeholder?: string,
-    title?: string
+    title?: string,
+    value: string,
+    setValue: React.Dispatch<React.SetStateAction<string>>
 }
 
 export default function Input(props: Props) {
@@ -19,6 +21,8 @@ export default function Input(props: Props) {
                 placeholder={props.placeholder}
                 title={props.title}
                 className={styles.input}
+                value={props.value}
+                onChange={(e) => props.setValue((_) => e.target.value)}
             />
         </>
     );
