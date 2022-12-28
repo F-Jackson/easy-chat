@@ -111,6 +111,7 @@ export default function Chats() {
                     <Button 
                         type='submit'
                         title={ chatSelectedState.length > 0 ? "Remove Chats" : "Add Chats"}
+                        animate={true}
                     >
                         { chatSelectedState.length > 0 ? "Remove Chats" : "Add Chats"}
                     </Button>

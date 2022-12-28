@@ -1,4 +1,5 @@
 import Message from "./Components/Message";
+import styles from "./Messages.module.scss";
 
 
 interface IMessage {
@@ -13,7 +14,7 @@ interface Props {
 
 export default function Messages(props: Props) {
     return (
-        <ul>
+        <ul className={styles.messages}>
             {
                 props.messages?.map(message => (
                     <li

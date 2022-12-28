@@ -1,0 +1,15 @@
+.messages {
+    background-color: rgba(46, 46, 46);
+    height: 20vh;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+        margin: 0;
+        padding: 0;
+    }
+}

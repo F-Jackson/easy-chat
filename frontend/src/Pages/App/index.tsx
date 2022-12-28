@@ -10,7 +10,7 @@ export default function App() {
         <RecoilRoot>
             <Header />
             <main>
-                <Introdution />
+                {/* <Introdution /> */}
                 <Communication />
             </main>
         </RecoilRoot>

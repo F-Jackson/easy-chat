@@ -25,6 +25,7 @@ export default function Header() {
                 <Button
                     title="View your chats"
                     onClick={() => openSideMenu()}
+                    animate={true}
                 >
                     <TbMessageDots />
                 </Button>
@@ -39,6 +40,7 @@ export default function Header() {
                     <Button
                         title="View your chats"
                         onClick={() => openSideMenu()}
+                        animate={true}
                     >
                         <TbMessageDots />
                     </Button>

@@ -7,7 +7,8 @@ interface Props {
     type?: "button" | "submit" | "reset" | undefined,
     title: string,
     children?: React.ReactNode,
-    onClick?: () => void
+    onClick?: () => void,
+    animate: boolean
 }
 
 export default function Button(props: Props) {
@@ -18,11 +19,13 @@ export default function Button(props: Props) {
         setClickedState((_) => false);
         clearTimeout(timeOutId);
 
-        setClickedState((_) => true);
+        if(props.animate) {
+            setClickedState((_) => true);
 
-        timeOutId = setTimeout(() => {
-            setClickedState((_) => false)
-        }, 300)
+            timeOutId = setTimeout(() => {
+                setClickedState((_) => false)
+            }, 300)
+        }
     }
 
 

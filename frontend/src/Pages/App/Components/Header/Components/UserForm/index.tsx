@@ -66,6 +66,7 @@ export default function UserForm() {
                 <Button
                     title={formActionState === "login" ? "Change to register" : "Change to login"}
                     onClick={() => changeFormAction()}
+                    animate={true}
                 >
                     {formActionState}
                 </Button>
@@ -104,6 +105,7 @@ export default function UserForm() {
                 <Button 
                     type="submit"
                     title="Submit user form"
+                    animate={true}
                 >
                     Send
                 </Button>

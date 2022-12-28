@@ -1,3 +1,6 @@
+import styles from "./Message.module.scss";
+
+
 interface Props {
     message?: string,
     owner: 'sender' | 'recipient'
@@ -5,7 +8,7 @@ interface Props {
 
 export default function Message(props: Props) {
     return (
-        <p>
+        <p className={styles.message}>
             {props.message}
         </p>
     );
