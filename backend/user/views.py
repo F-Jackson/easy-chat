@@ -1,15 +1,16 @@
+from django.contrib.auth.models import User
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from jwt_auth.user_auth import verify_user_auth
 
 from user.logic._common import invalid_token
 from user.logic.auth_login import auth_user_login
-from user.logic.user import create_user, get_user_info
+from user.logic.user import create_user, get_user_info, retrive_user_info
 from user.logic.user_call_history import show_call_history, add_call_in_history, update_call_in_history
-from user.serializers import UserSerializer, UserHistoryCallSerializer
+from user.serializers import UserSerializer, UserHistoryCallSerializer, SwaggerUserRetrive
 
 
 class UserHistoryCallViewset(viewsets.ViewSet):
@@ -138,6 +139,16 @@ class UserViewset(viewsets.ViewSet):
     )
     def create(self, request) -> Response:
         return create_user(request.data)
+
+    @swagger_auto_schema(
+        operation_summary="Retrive one User Info",
+        operation_description="Retrive one User Info",
+        responses={
+            200: openapi.Response("Retrive User username", SwaggerUserRetrive)
+        }
+    )
+    def retrive(self, request, pk=None) -> Response:
+        return retrive_user_info(pk)
 
 
 class AuthLoginViewset(viewsets.ViewSet):

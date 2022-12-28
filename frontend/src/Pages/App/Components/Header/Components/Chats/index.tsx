@@ -73,7 +73,7 @@ export default function Chats() {
     }
 
     useEffect(() => {
-        _GetChats();
+        // _GetChats();
     }, [jwtTokenState]);
 
 

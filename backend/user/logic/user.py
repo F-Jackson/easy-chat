@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from user.logic._common import send_error
-from user.serializers import UserSerializer
+from user.serializers import UserSerializer, SwaggerUserRetrive
 
 
 def get_user_info(data: dict, user: User) -> Response:
@@ -63,3 +63,13 @@ def _check_unique_users(data: dict) -> None:
         user_exists = User.objects.filter(unique_value=data[unique_value]).exists()
         if user_exists:
             raise PermissionError()
+
+
+def retrive_user_info(pk: int) -> Response:
+    try:
+        user = User.objects.get(pk=pk)
+    except User.DoesNotExist:
+        return send_error({}, 'User does not exist', status.HTTP_404_NOT_FOUND)
+    else:
+        serializer = SwaggerUserRetrive(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
