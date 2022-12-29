@@ -21,6 +21,7 @@
     "recoil": "^0.7.6",
     "typed-scss-modules": "^7.0.1",
     "typescript-plugin-css-modules": "^4.1.1",
+    "uniqid": "^5.4.0",
     "use-long-press": "^2.0.2",
     "web-vitals": "^2.1.4"
   },
@@ -49,6 +50,7 @@
     ]
   },
   "devDependencies": {
+    "@types/uniqid": "^5.3.2",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "eslint-config-standard-with-typescript": "^24.0.0",
     "eslint-plugin-import": "^2.26.0",

@@ -1,13 +1,14 @@
 import styles from "./Chats.module.scss";
 import Chat from "./Components/Chat";
 import { useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { jwtTokenAtom } from "../../../../../../States/user";
 import axios from "axios";
 import Input from "../../../../../../Components/Input";
 import Button from "../../../../../../Components/Button";
 import chats from "../../../../../../FakeData/chats.json";
 import { chatSelectedAtom } from "../../../../../../States/chatsSelected";
+import { errorAtom } from "../../../../../../States/error";
 
 
 interface IChat {
@@ -22,6 +23,7 @@ export default function Chats() {
     
     const [jwtTokenState, setJwtTokenState] = useRecoilState(jwtTokenAtom);
     const chatSelectedState = useRecoilValue(chatSelectedAtom);
+    const errorsState = useSetRecoilState(errorAtom);
 
     function _deleteChats() {
         axios.delete(`http://127.0.0.1:8000/chats/`, {
@@ -32,6 +34,9 @@ export default function Chats() {
             setJwtTokenState(response.data['token']);
         }).catch(error => {
             setJwtTokenState((_) => "");
+            if('error' in error.response.data) {
+                errorsState(error.response.data['error']);
+            }
         });
     }
 
@@ -48,6 +53,9 @@ export default function Chats() {
             setJwtTokenState(response.data['token']);
         }).catch(error => {
             setJwtTokenState((_) => "");
+            if('error' in error.response.data) {
+                errorsState(error.response.data['error']);
+            }
         });
     }
 
@@ -67,8 +75,11 @@ export default function Chats() {
             setChatsState((_) => chats);
 
             setJwtTokenState((_) => response.data['token']);
-        }).catch(errors => {
+        }).catch(error => {
             setJwtTokenState((_) => "");
+            if('error' in error.response.data) {
+                errorsState(error.response.data['error']);
+            }
         });
     }
 

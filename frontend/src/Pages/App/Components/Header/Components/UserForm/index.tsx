@@ -5,6 +5,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useSetRecoilState } from "recoil";
 import { jwtTokenAtom } from "../../../../../../States/user";
+import { errorAtom } from "../../../../../../States/error";
 
 
 interface IRequestData {
@@ -23,17 +24,22 @@ export default function UserForm() {
     const [passwordState, setPasswordState] = useState("");
 
     const setJwtToken = useSetRecoilState(jwtTokenAtom);
+    const errorsState = useSetRecoilState(errorAtom);
 
     function changeFormAction() {
-        setFormActionState((_) => formActionState === "login" ? "register" : "login");
+        setFormActionState((_) => formActionState === "login" ? "register":  "login");
     }
 
     function _Login(data: IRequestData) {
 
         axios.post('http://127.0.0.1:8000/user/', data).then(response => {
+            console.log("login")
             setJwtToken(response.data['token']);
         }).catch(error => {
-
+            console.log(error);
+            if('error' in error.response.data) {
+                errorsState(error.response.data['error']);
+            }
         })
     }
 
@@ -41,7 +47,11 @@ export default function UserForm() {
         axios.put('http://127.0.0.1:8000/user/', data).then(response => {
             _Login(data);
         }).catch(error => {
-
+            console.log("error r");
+            console.log(error);
+            if('error' in error.response.data) {
+                errorsState(error.response.data['error']);
+            }
         });
     }
 
@@ -68,7 +78,7 @@ export default function UserForm() {
                     onClick={() => changeFormAction()}
                     animate={true}
                 >
-                    {formActionState}
+                    {formActionState === "login" ? "register" : "login" }
                 </Button>
             </div>
             <form
