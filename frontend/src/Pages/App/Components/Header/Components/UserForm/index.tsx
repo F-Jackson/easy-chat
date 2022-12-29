@@ -31,26 +31,25 @@ export default function UserForm() {
     }
 
     function _Login(data: IRequestData) {
-
-        axios.post('http://127.0.0.1:8000/user/', data).then(response => {
-            console.log("login")
+        axios.post('http://127.0.0.1:8000/auth/login/', data).then(response => {
             setJwtToken(response.data['token']);
         }).catch(error => {
-            console.log(error);
-            if('error' in error.response.data) {
-                errorsState(error.response.data['error']);
+            if('response' in error &&'error' in error.response.data) {
+                errorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
+            } else {
+                errorsState((_) => []);
             }
         })
     }
 
     function _Register(data: IRequestData) {
-        axios.put('http://127.0.0.1:8000/user/', data).then(response => {
+        axios.post('http://127.0.0.1:8000/user/', data).then(response => {
             _Login(data);
         }).catch(error => {
-            console.log("error r");
-            console.log(error);
-            if('error' in error.response.data) {
-                errorsState(error.response.data['error']);
+            if('response' in error &&'error' in error.response.data) {
+                errorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
+            } else {
+                errorsState((_) => []);
             }
         });
     }
@@ -59,9 +58,9 @@ export default function UserForm() {
         e.preventDefault();
 
         const data = {
-            username: usernameState,
-            email: emailState,
-            password: passwordState
+            'username': usernameState,
+            'email': emailState,
+            'password': passwordState
         }
 
         formActionState === "login" ? _Login(data) : _Register(data)

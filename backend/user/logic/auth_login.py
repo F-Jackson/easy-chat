@@ -27,7 +27,7 @@ def _autheticate_user(request_data: dict) -> User:
     request_data_field(request_data, 'username', str)
     request_data_field(request_data, 'password', str)
 
-    user = authenticate(username=request_data['username'], password=request_data['password'])
+    user = authenticate(username=request_data['username'], password=str(request_data['password']))
 
     if user is not None:
         return user

@@ -18,8 +18,6 @@ def create_user(request_data: dict) -> Response:
             'username': '',
             'email': '',
             'password': '',
-            'first_name': '',
-            'last_name': ''
         }
 
         _fill_data_with_request_data(request_data, data)
@@ -28,9 +26,9 @@ def create_user(request_data: dict) -> Response:
 
         _valid_data_has_empty(data)
     except ValueError as e:
-        return send_error({}, 'Data is not valid for create a user', status=status.HTTP_400_BAD_REQUEST)
+        return send_error({}, 'Data is not valid for create a user', status.HTTP_400_BAD_REQUEST)
     else:
-        User.objects.create_user(**data)
+        User.objects.create_user(username=data['username'], email=data['email'], password=data['password'])
 
         return Response(status=status.HTTP_201_CREATED)
 
@@ -42,7 +40,7 @@ def _fill_data_with_request_data(request_data: dict, data: dict) -> None:
         value_is_not_empty = value.strip() != ''
 
         if data_have_key and type_value_is_str and value_is_not_empty:
-            data[key] = value
+            data[key] = str(value)
 
 
 def _valid_data_has_empty(data: dict) -> None:
@@ -57,12 +55,13 @@ def _valid_if_user_credential(data: dict) -> None:
 
 
 def _check_unique_users(data: dict) -> None:
-    unique_values_valid = ('username', 'email')
+    email_exist = User.objects.filter(email=data['email']).exists()
+    username_exist = User.objects.filter(username=data['username']).exists()
 
-    for unique_value in unique_values_valid:
-        user_exists = User.objects.filter(unique_value=data[unique_value]).exists()
-        if user_exists:
-            raise PermissionError()
+    user_exists = any([email_exist, username_exist])
+
+    if user_exists:
+        raise PermissionError()
 
 
 def retrive_user_info(pk: int) -> Response:
