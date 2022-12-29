@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from jwt_auth.logic.verify_client_token import ClientTokenVerifier
 
 
-def verify_user_auth(request, get_user: bool = False) -> None | dict[str, User]:
+def verify_user_auth(request, get_user: bool = False) -> None | list[str, [User]]:
     token = str(request.META.get('HTTP_TOKEN'))
     if token:
         jwt = ClientTokenVerifier(token)
@@ -12,9 +12,7 @@ def verify_user_auth(request, get_user: bool = False) -> None | dict[str, User]:
             token = jwt.client_token[0]
             user_id = jwt.client_token[1]['sub']
 
-            data = {
-                'token': token
-            }
+            data = [token]
 
             if get_user:
                 try:
@@ -22,7 +20,7 @@ def verify_user_auth(request, get_user: bool = False) -> None | dict[str, User]:
                 except User.DoesNotExist:
                     return None
                 else:
-                    data.update({'user': user})
+                    data.append(user)
 
             return data
     return None

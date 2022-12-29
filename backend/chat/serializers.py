@@ -9,13 +9,19 @@ class ChatSerializer(serializers.ModelSerializer):
         exclude = ['pub_key', 'priv_key']
 
 
+class SChats(serializers.Serializer):
+    id = serializers.IntegerField()
+    user_1 = serializers.CharField()
+    user_2 = serializers.CharField()
+
+
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = MessagesModel
         exclude = ['chat']
 
 
-class SwaggerMessage(serializers.Serializer):
+class SMessages(serializers.Serializer):
     id = serializers.IntegerField()
     user = serializers.IntegerField()
     message = serializers.CharField()

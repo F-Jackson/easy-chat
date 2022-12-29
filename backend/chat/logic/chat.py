@@ -10,9 +10,20 @@ from chat.serializers import ChatSerializer
 
 def get_chat_info(data: dict, user: User) -> Response:
     queryset = ChatModel.objects.filter(user_1_id=user) | ChatModel.objects.filter(user_2_id=user)
-    serializer = ChatSerializer(queryset, many=True)
 
-    data.update(serializer.data)
+    data['chats'] = []
+    for model in queryset:
+        chat_id = model.pk
+
+        chat_data = {
+            'id': chat_id,
+            'user_1': model.user_1_id.username,
+            'user_2': model.user_2_id.username
+        }
+
+        data['chats'].append(chat_data)
+
+    data.update(data)
 
     return Response(data, status=status.HTTP_200_OK)
 

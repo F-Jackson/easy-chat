@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from chat.logic._common import invalid_token
 from chat.logic.chat import get_chat_info, create_new_chat, destroy_chat
 from chat.logic.message import get_chat_messages, create_message, detroy_message
-from chat.serializers import ChatSerializer, SwaggerMessage
+from chat.serializers import SMessages, SChats
 
 from jwt_auth.user_auth import verify_user_auth
 
@@ -20,7 +20,7 @@ class ChatsViewset(viewsets.ViewSet):
                               type=openapi.TYPE_STRING)
         ],
         responses={
-            200: openapi.Response("Retrives new client token and user info", ChatSerializer)
+            200: openapi.Response("Retrives new client token and user info", SChats)
         }
     )
     def list(self, request) -> Response:
@@ -102,7 +102,7 @@ class MessagesViewset(viewsets.ViewSet):
                               type=openapi.TYPE_NUMBER),
         ],
         responses={
-            200: openapi.Response("Retrives new client token and a list of messages", SwaggerMessage),
+            200: openapi.Response("Retrives new client token and a list of messages", SMessages),
             400: openapi.Response("Retrives new client token"),
             404: openapi.Response("Retrives new client token"),
             401: openapi.Response("If authenticated retrives new client token")
@@ -149,7 +149,7 @@ class MessagesViewset(viewsets.ViewSet):
                 'token': token
             }
 
-            return create_message(data, request, user)
+            return create_message(data, request.data, user)
         return invalid_token()
 
     @swagger_auto_schema(

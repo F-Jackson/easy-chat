@@ -33,7 +33,7 @@ def get_chat_messages(data: dict, request_data: dict, user: User) -> Response:
 
 
 def _verify_owner(user: User, chat: ChatModel) -> None:
-    if chat.user_1_id != user.pk and chat.user_2_id != user.pk:
+    if chat.user_1_id != user and chat.user_2_id != user:
         raise PermissionError()
 
 
@@ -46,7 +46,7 @@ def _get_messages_data(messages: list[MessagesModel], priv_key) -> list[dict]:
 
         new_data = {
             'id': msg.pk,
-            'user': getattr(msg, 'user').pk,
+            'user': getattr(msg, 'user').username,
             'message': message,
             'date': getattr(msg, 'date')
         }

@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'first_name', 'last_name']
 
 
-class SwaggerUserRetrive(serializers.ModelSerializer):
+class SUser(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username']
