@@ -17,7 +17,7 @@ class ChatsViewset(viewsets.ViewSet):
         operation_description="Get Chat info if authenticated",
         manual_parameters=[
             openapi.Parameter("token", openapi.IN_HEADER, description="Client Jwt Token",
-                              type=openapi.TYPE_STRING)
+                              type=openapi.TYPE_STRING, required=True)
         ],
         responses={
             200: openapi.Response("Retrives new client token and user info", SChats)
@@ -41,9 +41,9 @@ class ChatsViewset(viewsets.ViewSet):
         operation_description="Create new chat between the authenticated User and the given User",
         manual_parameters=[
             openapi.Parameter("token", openapi.IN_HEADER, description="Client Jwt Token",
-                              type=openapi.TYPE_STRING),
-            openapi.Parameter("talk_to", openapi.IN_BODY, description="User username that you want to chat with",
-                              type=openapi.TYPE_NUMBER),
+                              type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter("talk_to", openapi.IN_QUERY, description="User username that you want to chat with",
+                              type=openapi.TYPE_NUMBER, required=True),
 
         ],
         responses={
@@ -70,9 +70,9 @@ class ChatsViewset(viewsets.ViewSet):
         operation_description="Destroy given chat if User is authenticated and is the owner of the chat",
         manual_parameters=[
             openapi.Parameter("token", openapi.IN_HEADER, description="Client Jwt Token",
-                              type=openapi.TYPE_STRING),
-            openapi.Parameter("chats_id_to_delete", openapi.IN_BODY, description="List of chats ids to delete",
-                              type=openapi.TYPE_ARRAY)
+                              type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter("chats_id_to_delete", openapi.IN_QUERY, description="List of chats ids to delete",
+                              type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_NUMBER), required=True)
         ],
         responses={
             200: openapi.Response("Retrives new client token"),
@@ -99,9 +99,9 @@ class MessagesViewset(viewsets.ViewSet):
         operation_description="Get Messages from the given chat if User is authenticated and is the owner of the chat",
         manual_parameters=[
             openapi.Parameter("token", openapi.IN_HEADER, description="Client Jwt Token",
-                              type=openapi.TYPE_STRING),
-            openapi.Parameter("chat", openapi.IN_BODY, description="Chat id that you to see the messages",
-                              type=openapi.TYPE_NUMBER),
+                              type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter("chat", openapi.IN_QUERY, description="Chat id that you to see the messages",
+                              type=openapi.TYPE_NUMBER, required=True),
         ],
         responses={
             200: openapi.Response("Retrives new client token and a list of messages", SMessages),
@@ -128,11 +128,11 @@ class MessagesViewset(viewsets.ViewSet):
         operation_description="Create new message inside the given chat",
         manual_parameters=[
             openapi.Parameter("token", openapi.IN_HEADER, description="Client Jwt Token",
-                              type=openapi.TYPE_STRING),
-            openapi.Parameter("chat", openapi.IN_BODY, description="Chat id that you to the message inside",
-                              type=openapi.TYPE_NUMBER),
-            openapi.Parameter("message", openapi.IN_BODY, description="Message that you want to send",
-                              type=openapi.TYPE_STRING),
+                              type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter("chat", openapi.IN_QUERY, description="Chat id that you to the message inside",
+                              type=openapi.TYPE_NUMBER, required=True),
+            openapi.Parameter("message", openapi.IN_QUERY, description="Message that you want to send",
+                              type=openapi.TYPE_STRING, required=True),
         ],
         responses={
             200: openapi.Response("Retrives new client token"),
@@ -159,9 +159,9 @@ class MessagesViewset(viewsets.ViewSet):
         operation_description="Destroy given message if User is authenticated and is the owner of the message",
         manual_parameters=[
             openapi.Parameter("token", openapi.IN_HEADER, description="Client Jwt Token",
-                              type=openapi.TYPE_STRING),
-            openapi.Parameter("messages_id_to_delete", openapi.IN_BODY, description="List of messages ids to delete",
-                              type=openapi.TYPE_ARRAY)
+                              type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter("messages_id_to_delete", openapi.IN_QUERY, description="List of messages ids to delete",
+                              type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_NUMBER), required=True)
         ],
         responses={
             200: openapi.Response("Retrives new client token"),

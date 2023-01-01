@@ -119,9 +119,11 @@ def detroy_message(data: dict, user: User, request_data: dict):
     try:
         request_data_field(request_data, 'messages_id_to_delete', list)
 
-        message = MessagesModel.objects.filter(pk__in=request_data['messages_id_to_delete'])
+        messages = MessagesModel.objects.filter(pk__in=request_data['messages_id_to_delete'], user=user)
     except ValueError as e:
         return send_error(data, 'Request needs a "messages_id_to_delete" list', status.HTTP_400_BAD_REQUEST)
     else:
-        message.delete()
+        for msg in messages:
+            msg.delete()
+
         return Response(data, status=status.HTTP_200_OK)

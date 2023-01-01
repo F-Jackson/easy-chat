@@ -17,7 +17,7 @@ class UserHistoryCallViewset(viewsets.ViewSet):
         operation_summary="Get User Call History",
         operation_description="Get User Call History if authenticated",
         manual_parameters=[
-            openapi.Parameter("token", openapi.IN_QUERY, description="Client Jwt Token must be given in request Header",
+            openapi.Parameter("token", openapi.IN_HEADER, description="Client Jwt Token must be given in request Header",
                               type=openapi.TYPE_STRING)
         ],
         responses={
@@ -28,8 +28,7 @@ class UserHistoryCallViewset(viewsets.ViewSet):
         jwt_is_valid = verify_user_auth(request, True)
 
         if jwt_is_valid:
-            token = jwt_is_valid['token']
-            user = jwt_is_valid['user']
+            token, user = jwt_is_valid
 
             data = {
                 'token': token
@@ -57,8 +56,7 @@ class UserHistoryCallViewset(viewsets.ViewSet):
         jwt_is_valid = verify_user_auth(request, True)
 
         if jwt_is_valid:
-            token = jwt_is_valid['token']
-            user = jwt_is_valid['user']
+            token, user = jwt_is_valid
 
             data = {
                 'token': token
@@ -87,8 +85,7 @@ class UserHistoryCallViewset(viewsets.ViewSet):
         jwt_is_valid = verify_user_auth(request, True)
 
         if jwt_is_valid:
-            token = jwt_is_valid['token']
-            user = jwt_is_valid['user']
+            token, user = jwt_is_valid
 
             data = {
                 'token': token
@@ -103,8 +100,8 @@ class UserViewset(viewsets.ViewSet):
         operation_summary="Get User info",
         operation_description="Get User info if authenticated",
         manual_parameters=[
-            openapi.Parameter("token", openapi.IN_QUERY, description="Client Jwt Token must be given in request Header",
-                              type=openapi.TYPE_STRING)
+            openapi.Parameter("token", openapi.IN_HEADER, description="Client Jwt Token",
+                              type=openapi.TYPE_STRING, required=True)
         ],
         responses={
             200: openapi.Response("Retrives new client token and user info", UserSerializer)
@@ -127,9 +124,12 @@ class UserViewset(viewsets.ViewSet):
         operation_summary="Create User",
         operation_description="Create User if User doesnt does not exists",
         manual_parameters=[
-            openapi.Parameter("username", openapi.IN_QUERY, description="User username", type=openapi.TYPE_STRING),
-            openapi.Parameter("email", openapi.IN_QUERY, description="User email", type=openapi.TYPE_STRING),
-            openapi.Parameter("password", openapi.IN_QUERY, description="User password", type=openapi.TYPE_STRING)
+            openapi.Parameter("username", openapi.IN_QUERY, description="User username", type=openapi.TYPE_STRING,
+                              required=True),
+            openapi.Parameter("email", openapi.IN_QUERY, description="User email", type=openapi.TYPE_STRING,
+                              required=True),
+            openapi.Parameter("password", openapi.IN_QUERY, description="User password", type=openapi.TYPE_STRING,
+                              required=True)
         ],
         responses={
             201: openapi.Response("Nothing is Retrived")
@@ -154,8 +154,10 @@ class AuthLoginViewset(viewsets.ViewSet):
         operation_summary="Login User",
         operation_description="Auth User and login, retrives a acess token",
         manual_parameters=[
-            openapi.Parameter("username", openapi.IN_QUERY, description="User username", type=openapi.TYPE_STRING),
-            openapi.Parameter("password", openapi.IN_QUERY, description="User password", type=openapi.TYPE_STRING)
+            openapi.Parameter("username", openapi.IN_QUERY, description="User username", type=openapi.TYPE_STRING,
+                              required=True),
+            openapi.Parameter("password", openapi.IN_QUERY, description="User password", type=openapi.TYPE_STRING,
+                              required=True)
         ],
         responses={
             200: openapi.Response("Retrives a client Token")
