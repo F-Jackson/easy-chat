@@ -81,11 +81,16 @@ def _create_chat(encrypt_keys: dict, user: User, user_2: User) -> Response:
     return Response(status=status.HTTP_201_CREATED)
 
 
-def destroy_chat(data: dict, pk: int) -> Response:
+def destroy_chat(data: dict, request_data: dict, user: User) -> Response:
     try:
-        chat = ChatModel.objects.get(pk=pk)
-    except ChatModel.DoesNotExist:
-        return send_error(data, 'Cant find chat id', status.HTTP_404_NOT_FOUND)
+        request_data_field(request_data, 'chats_id_to_delete', list)
+
+        chats = ChatModel.objects.filter(pk__in=request_data['chats_id_to_delete'])
+    except ValueError as e:
+        return send_error(data, 'Request needs a "chats_id_to_delete" list', status.HTTP_400_BAD_REQUEST)
     else:
-        chat.delete()
+        for chat in chats:
+            if chat.user_1_id == user or chat.user_2_id == user:
+                chat.delete()
+
         return Response(data, status=status.HTTP_200_OK)

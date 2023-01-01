@@ -115,11 +115,13 @@ def _create_message_in_db(data: dict, chat: ChatModel, message: bytes, user: Use
     return Response(data, status=status.HTTP_201_CREATED)
 
 
-def detroy_message(data: dict, user: User, pk: int):
+def detroy_message(data: dict, user: User, request_data: dict):
     try:
-        message = MessagesModel.objects.get(pk=pk, user=user)
-    except MessagesModel.DoesNotExist:
-        return send_error(data, 'Message does not exists', status.HTTP_404_NOT_FOUND)
+        request_data_field(request_data, 'messages_id_to_delete', list)
+
+        message = MessagesModel.objects.filter(pk__in=request_data['messages_id_to_delete'])
+    except ValueError as e:
+        return send_error(data, 'Request needs a "messages_id_to_delete" list', status.HTTP_400_BAD_REQUEST)
     else:
         message.delete()
         return Response(data, status=status.HTTP_200_OK)
