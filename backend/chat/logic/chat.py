@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
 
-from chat.logic._common import send_error
+from chat.logic._common import send_error, request_data_field
 from chat.models import ChatModel
 from chat.serializers import ChatSerializer
 
@@ -30,7 +30,11 @@ def get_chat_info(data: dict, user: User) -> Response:
 
 def create_new_chat(data: dict, request_data: dict, user: User) -> Response:
     try:
-        user_2 = User.objects.get(id=request_data['send_to'])
+        request_data_field(request_data, 'talk_to', str)
+
+        user_2 = User.objects.get(username=request_data['talk_to'])
+    except ValueError as e:
+        return send_error(data, 'Request needs a "talk_to" username', status.HTTP_400_BAD_REQUEST)
     except User.DoesNotExist:
         return send_error(data, 'Cant find user to send messages', status.HTTP_404_NOT_FOUND)
     else:

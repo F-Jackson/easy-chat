@@ -65,30 +65,30 @@ class ChatsViewset(viewsets.ViewSet):
             return create_new_chat(data, request.data, user)
         return invalid_token()
 
-    @swagger_auto_schema(
-        operation_summary="Destroy chat",
-        operation_description="Destroy given chat if User is authenticated and is the owner of the chat",
-        manual_parameters=[
-            openapi.Parameter("token", openapi.IN_QUERY, description="Client Jwt Token must be given in request Header",
-                              type=openapi.TYPE_STRING),
-        ],
-        responses={
-            200: openapi.Response("Retrives new client token"),
-            404: openapi.Response("Retrives new client token")
-        }
-    )
-    def destroy(self, request, pk=None) -> Response:
-        jwt_is_valid = verify_user_auth(request, True)
-
-        if jwt_is_valid:
-            token, user = jwt_is_valid
-
-            data = {
-                'token': token
-            }
-
-            return destroy_chat(data, pk)
-        return invalid_token()
+    # @swagger_auto_schema(
+    #     operation_summary="Destroy chat",
+    #     operation_description="Destroy given chat if User is authenticated and is the owner of the chat",
+    #     manual_parameters=[
+    #         openapi.Parameter("token", openapi.IN_QUERY, description="Client Jwt Token must be given in request Header",
+    #                           type=openapi.TYPE_STRING),
+    #     ],
+    #     responses={
+    #         200: openapi.Response("Retrives new client token"),
+    #         404: openapi.Response("Retrives new client token")
+    #     }
+    # )
+    # def destroy(self, request, pk=None) -> Response:
+    #     jwt_is_valid = verify_user_auth(request, True)
+    #
+    #     if jwt_is_valid:
+    #         token, user = jwt_is_valid
+    #
+    #         data = {
+    #             'token': token
+    #         }
+    #
+    #         return destroy_chat(data, pk)
+    #     return invalid_token()
 
 
 class MessagesViewset(viewsets.ViewSet):
