@@ -1,5 +1,6 @@
 from pathlib import Path, os
 from dotenv import load_dotenv
+from corsheaders.defaults import default_headers
 
 
 load_dotenv()
@@ -19,7 +20,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '127.0.0.1'
+    '*'
 ]
 
 
@@ -136,3 +137,7 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "token",
+]

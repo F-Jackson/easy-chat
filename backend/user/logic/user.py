@@ -36,10 +36,9 @@ def create_user(request_data: dict) -> Response:
 def _fill_data_with_request_data(request_data: dict, data: dict) -> None:
     for key, value in request_data.items():
         data_have_key = key in data.keys()
-        type_value_is_str = type(value) == str
-        value_is_not_empty = value.strip() != ''
+        value_is_not_empty = str(value).strip() != ''
 
-        if data_have_key and type_value_is_str and value_is_not_empty:
+        if data_have_key and value_is_not_empty:
             data[key] = str(value)
 
 
