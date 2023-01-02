@@ -97,35 +97,6 @@ class ChatsView(APIView):
 
 class MessagesView(APIView):
     @swagger_auto_schema(
-        operation_summary="Get Messages List",
-        operation_description="Get Messages from the given chat if User is authenticated and is the owner of the chat",
-        manual_parameters=[
-            openapi.Parameter("token", openapi.IN_HEADER, description="Client Jwt Token",
-                              type=openapi.TYPE_STRING, required=True),
-            openapi.Parameter("chat", openapi.IN_QUERY, description="Chat id that you to see the messages",
-                              type=openapi.TYPE_NUMBER, required=True),
-        ],
-        responses={
-            200: openapi.Response("Retrives new client token and a list of messages", SMessages),
-            400: openapi.Response("Retrives new client token"),
-            404: openapi.Response("Retrives new client token"),
-            401: openapi.Response("If authenticated retrives new client token")
-        }
-    )
-    def get(self, request) -> Response:
-        jwt_is_valid = verify_user_auth(request, True)
-
-        if jwt_is_valid:
-            token, user = jwt_is_valid
-
-            data = {
-                'token': token
-            }
-
-            return get_chat_messages(data, request.data, user)
-        return invalid_token()
-
-    @swagger_auto_schema(
         operation_summary="Create new message",
         operation_description="Create new message inside the given chat",
         manual_parameters=[
@@ -143,7 +114,7 @@ class MessagesView(APIView):
             401: openapi.Response("If authenticated retrives new client token")
         }
     )
-    def post(self, request):
+    def post(self, request, format=None):
         jwt_is_valid = verify_user_auth(request, True)
 
         if jwt_is_valid:
@@ -170,7 +141,7 @@ class MessagesView(APIView):
             404: openapi.Response("Retrives new client token")
         }
     )
-    def delete(self, request) -> Response:
+    def delete(self, request, format=None) -> Response:
         jwt_is_valid = verify_user_auth(request, True)
 
         if jwt_is_valid:
@@ -181,4 +152,34 @@ class MessagesView(APIView):
             }
 
             return detroy_message(data, user, request.data)
+        return invalid_token()
+
+
+class MessagesListView(APIView):
+    @swagger_auto_schema(
+        operation_summary="Get Messages List",
+        operation_description="Get Messages from the given chat if User is authenticated and is the owner of the chat",
+        manual_parameters=[
+            openapi.Parameter("token", openapi.IN_HEADER, description="Client Jwt Token",
+                              type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter("chat", openapi.IN_QUERY, description="Chat id that you to see the messages",
+                              type=openapi.TYPE_NUMBER, required=True),
+        ],
+        responses={
+            200: openapi.Response("Retrives new client token and a list of messages", SMessages),
+            400: openapi.Response("Retrives new client token"),
+            404: openapi.Response("Retrives new client token"),
+            401: openapi.Response("If authenticated retrives new client token")
+        }
+    )
+    def get(self, request, pk=None) -> Response:
+        jwt_is_valid = verify_user_auth(request, True)
+
+        if jwt_is_valid and pk is not None:
+            token, user = jwt_is_valid
+
+            data = {
+                'token': token
+            }
+            return get_chat_messages(data, user, pk)
         return invalid_token()

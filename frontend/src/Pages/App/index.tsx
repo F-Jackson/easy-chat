@@ -4,6 +4,7 @@ import Communication from './Components/Communication';
 import Header from './Components/Header';
 import Introdution from './Components/Introdution';
 import { useRecoilValue } from "recoil";
+import styles from './App.module.scss';
 
 
 export default function App() {
@@ -13,7 +14,7 @@ export default function App() {
         <>
             <Header />
             { errorState.length > 0 ? <Alert errors={errorState}/> : <></>}
-            <main>
+            <main className={styles.main}>
                 {/* <Introdution /> */}
                 <Communication />
             </main>

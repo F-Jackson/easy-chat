@@ -38,7 +38,7 @@ def create_new_chat(data: dict, request_data: dict, user: User) -> Response:
     except User.DoesNotExist:
         return send_error(data, 'Cant find user to send messages', status.HTTP_404_NOT_FOUND)
     else:
-        encrypt_keys = _create_secret_keys(512)
+        encrypt_keys = _create_secret_keys(2048)
 
         valid_serializer = _valid_chat_data(encrypt_keys, user, user_2)
 

@@ -1,15 +1,14 @@
 .messages {
-    background-color: rgba(46, 46, 46);
     height: 20vh;
     overflow-y: scroll;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    margin: 0;
-    padding: 0;
+    margin: 0 auto;
+    padding: 10px;
     list-style: none;
-
-    li {
-        margin: 0;
-        padding: 0;
-    }
+    row-gap: 5px;
+    max-width: 500px;
+    background-color: rgba(255, 255, 255, 0.025);
+    border: rgba(255, 255, 255, 0.075) solid 2px;
 }

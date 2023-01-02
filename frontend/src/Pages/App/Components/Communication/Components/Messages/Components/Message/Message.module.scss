@@ -1,6 +1,14 @@
 .message {
-    background-color: white;
-    font-size: 16px;
-    padding: 5px;
-    color: black;
+    margin: 0;
+    width: 100%;
+    max-width: 300px;
+    padding: 0;
+    border: solid transparent 2px;
+
+    &__text {
+        margin: 0;
+        font-size: 16px;
+        padding: 2px 4px;
+        border-radius: 8px;
+    }
 }

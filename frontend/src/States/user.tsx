@@ -6,4 +6,9 @@ const jwtTokenAtom = atom({
     default: "" as string
 });
 
-export { jwtTokenAtom }
+const userUsernameAtom = atom({
+    key: "usernameAtom",
+    default: "" as string
+});
+
+export { jwtTokenAtom, userUsernameAtom }

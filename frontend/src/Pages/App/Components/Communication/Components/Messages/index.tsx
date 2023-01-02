@@ -1,30 +1,24 @@
+import { useRecoilValue } from "recoil";
 import Message from "./Components/Message";
 import styles from "./Messages.module.scss";
+import { messagesAtom } from "../../../../../../States/messages";
+import { userUsernameAtom } from "../../../../../../States/user";
 
 
-interface IMessage {
-    id: number,
-    msg: string,
-    owner: 'sender' | 'recipient'
-}
+export default function Messages() {
+    const messagesState = useRecoilValue(messagesAtom);
+    const userUsernameState = useRecoilValue(userUsernameAtom);
 
-interface Props {
-    messages?: IMessage[]
-}
 
-export default function Messages(props: Props) {
     return (
         <ul className={styles.messages}>
             {
-                props.messages?.map(message => (
-                    <li
+                messagesState.messages?.map(message => (
+                    <Message
+                        message={message.message}
+                        owner={message.user === userUsernameState ? "you" : "other"}
                         key={message.id}
-                    >
-                        <Message 
-                            message={message.msg}
-                            owner={message.owner}
-                        />
-                    </li>
+                    />
                 ))
             }
         </ul>

@@ -24,12 +24,11 @@
     background-color: rgba(255, 255, 255, 0.025);
     border: rgba(255, 255, 255, 0.075) solid 2px;
     height: max-content;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     
     form {
         display: flex;
         flex-direction: column;
         row-gap: 1rem;
-        align-items: flex-end;
     }
 }

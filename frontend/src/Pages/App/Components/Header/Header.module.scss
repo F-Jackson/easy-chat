@@ -18,11 +18,10 @@
     background-color: #111;
     overflow-x: hidden;
     transition: 0.5s;
-    padding-top: 60px;
     margin: 0;
     padding: 15px 20px;
     display: grid;
-    grid-template-rows: auto auto 1fr;
+    grid-template-rows: auto 1fr auto;
     row-gap: 20px;
 
     &--active {

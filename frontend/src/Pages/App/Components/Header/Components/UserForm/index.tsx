@@ -4,7 +4,7 @@ import Input from "../../../../../../Components/Input";
 import { useState } from "react";
 import axios from "axios";
 import { useSetRecoilState } from "recoil";
-import { jwtTokenAtom } from "../../../../../../States/user";
+import { jwtTokenAtom, userUsernameAtom } from "../../../../../../States/user";
 import { errorAtom } from "../../../../../../States/error";
 
 
@@ -25,20 +25,45 @@ export default function UserForm() {
 
     const setJwtToken = useSetRecoilState(jwtTokenAtom);
     const errorsState = useSetRecoilState(errorAtom);
+    const setUserUsernameState = useSetRecoilState(userUsernameAtom);
+
+    function _Error(error: any) {
+        setJwtToken((_) => "");
+        if('response' in error && 'error' in error.response.data) {
+            errorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
+        } else {
+            errorsState((_) => []);
+        }
+    }
 
     function changeFormAction() {
         setFormActionState((_) => formActionState === "login" ? "register":  "login");
     }
 
+    function _GetUserUsername(jwtToken: string) {
+        axios.get('http://127.0.0.1:8000/user/', {
+            headers: {
+                'token': jwtToken
+            }
+        }).then(response => {
+            setJwtToken(response.data['token']);
+
+            const username = response.data['user']['username']
+            
+            setUserUsernameState((old) => old === username ? old : username);
+        }).then(error => {
+            setJwtToken("");
+            _Error(error);
+        })
+    }
+
     function _Login(data: IRequestData) {
         axios.post('http://127.0.0.1:8000/auth/login/', data).then(response => {
+            _GetUserUsername(response.data['token']);
+
             setJwtToken(response.data['token']);
         }).catch(error => {
-            if('response' in error &&'error' in error.response.data) {
-                errorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
-            } else {
-                errorsState((_) => []);
-            }
+            _Error(error);
         })
     }
 
@@ -46,11 +71,7 @@ export default function UserForm() {
         axios.post('http://127.0.0.1:8000/user/', data).then(response => {
             _Login(data);
         }).catch(error => {
-            if('response' in error &&'error' in error.response.data) {
-                errorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
-            } else {
-                errorsState((_) => []);
-            }
+            _Error(error);
         });
     }
 

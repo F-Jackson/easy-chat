@@ -8,11 +8,9 @@ from chat.models import MessagesModel, ChatModel
 from chat.serializers import MessageSerializer
 
 
-def get_chat_messages(data: dict, request_data: dict, user: User) -> Response:
+def get_chat_messages(data: dict, user: User, chat_id: int) -> Response:
     try:
-        request_data_field(request_data, 'chat', int)
-
-        chat = ChatModel.objects.get(pk=request_data['chat'])
+        chat = ChatModel.objects.get(pk=chat_id)
 
         _verify_owner(user, chat)
     except ValueError as e:

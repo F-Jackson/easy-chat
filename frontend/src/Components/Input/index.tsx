@@ -8,7 +8,8 @@ interface Props {
     placeholder?: string,
     title?: string,
     value: string,
-    setValue: React.Dispatch<React.SetStateAction<string>>
+    setValue: React.Dispatch<React.SetStateAction<string>>,
+    maxLength?: number 
 }
 
 export default function Input(props: Props) {
@@ -23,6 +24,7 @@ export default function Input(props: Props) {
                 className={styles.input}
                 value={props.value}
                 onChange={(e) => props.setValue((_) => e.target.value)}
+                maxLength={props.maxLength}
             />
         </>
     );

@@ -23,6 +23,6 @@ class MessageSerializer(serializers.ModelSerializer):
 
 class SMessages(serializers.Serializer):
     id = serializers.IntegerField()
-    user = serializers.IntegerField()
+    user = serializers.CharField()
     message = serializers.CharField()
     date = serializers.DateTimeField()

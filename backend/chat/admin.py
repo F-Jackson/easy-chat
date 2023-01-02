@@ -7,3 +7,10 @@ class ChatAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ChatModel, ChatAdmin)
+
+
+class MessageAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(MessagesModel, MessageAdmin)
