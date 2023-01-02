@@ -1,7 +1,8 @@
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from chat.logic._common import invalid_token
 from chat.logic.chat import get_chat_info, create_new_chat, destroy_chat
@@ -11,7 +12,7 @@ from chat.serializers import SMessages, SChats
 from jwt_auth.user_auth import verify_user_auth
 
 
-class ChatsViewset(viewsets.ViewSet):
+class ChatsView(APIView):
     @swagger_auto_schema(
         operation_summary="Get Chat info",
         operation_description="Get Chat info if authenticated",
@@ -23,7 +24,7 @@ class ChatsViewset(viewsets.ViewSet):
             200: openapi.Response("Retrives new client token and user info", SChats)
         }
     )
-    def list(self, request) -> Response:
+    def get(self, request, format=None) -> Response:
         jwt_is_valid = verify_user_auth(request, True)
 
         if jwt_is_valid:
@@ -52,7 +53,7 @@ class ChatsViewset(viewsets.ViewSet):
             404: openapi.Response("Retrives new client token")
         }
     )
-    def create(self, request) -> Response:
+    def post(self, request, format=None) -> Response:
         jwt_is_valid = verify_user_auth(request, True)
 
         if jwt_is_valid:
@@ -79,7 +80,8 @@ class ChatsViewset(viewsets.ViewSet):
             404: openapi.Response("Retrives new client token")
         }
     )
-    def destroy(self, request, pk=None) -> Response:
+    @action(methods=['delete'], detail=False, url_name='delete', url_path='delete')
+    def delete(self, request, format=None) -> Response:
         jwt_is_valid = verify_user_auth(request, True)
 
         if jwt_is_valid:
@@ -93,7 +95,7 @@ class ChatsViewset(viewsets.ViewSet):
         return invalid_token()
 
 
-class MessagesViewset(viewsets.ViewSet):
+class MessagesView(APIView):
     @swagger_auto_schema(
         operation_summary="Get Messages List",
         operation_description="Get Messages from the given chat if User is authenticated and is the owner of the chat",
@@ -110,7 +112,7 @@ class MessagesViewset(viewsets.ViewSet):
             401: openapi.Response("If authenticated retrives new client token")
         }
     )
-    def list(self, request) -> Response:
+    def get(self, request) -> Response:
         jwt_is_valid = verify_user_auth(request, True)
 
         if jwt_is_valid:
@@ -141,7 +143,7 @@ class MessagesViewset(viewsets.ViewSet):
             401: openapi.Response("If authenticated retrives new client token")
         }
     )
-    def create(self, request):
+    def post(self, request):
         jwt_is_valid = verify_user_auth(request, True)
 
         if jwt_is_valid:
@@ -168,7 +170,7 @@ class MessagesViewset(viewsets.ViewSet):
             404: openapi.Response("Retrives new client token")
         }
     )
-    def destroy(self, request, pk=None) -> Response:
+    def delete(self, request) -> Response:
         jwt_is_valid = verify_user_auth(request, True)
 
         if jwt_is_valid:

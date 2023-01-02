@@ -4,12 +4,10 @@ from rest_framework import routers, permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from chat.views import ChatsViewset, MessagesViewset
+from chat.views import ChatsView, MessagesView
 from user.views import UserHistoryCallViewset, UserViewset, AuthLoginViewset
 
 api_router = routers.DefaultRouter()
-api_router.register('chats', ChatsViewset, basename='chats')
-api_router.register('messages', MessagesViewset, basename='messages')
 api_router.register('call-history', UserHistoryCallViewset, basename='callHistory')
 api_router.register('user', UserViewset, basename='user')
 
@@ -33,6 +31,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(api_router.urls)),
     path('auth/', include(auth_router.urls)),
+    path('chats/', ChatsView.as_view(), name='chats_view'),
+    path('messages/', MessagesView.as_view(), name='messages_view'),
     path('swagger_json', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc')
