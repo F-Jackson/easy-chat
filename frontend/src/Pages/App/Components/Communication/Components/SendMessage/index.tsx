@@ -40,7 +40,8 @@ export default function SendMessage() {
                     id: uniqid(),
                     user: userUsernameState,
                     message: message,
-                    date: new Date()
+                    date: new Date(),
+                    sendedNow: true
                 };
 
                 const newMessages = {
@@ -53,13 +54,13 @@ export default function SendMessage() {
 
                 setMessagesState(newMessages);
 
-                setMessageState("");
             }).catch(error => {
                 setMessageState("");
             });
 
             setTimeout(() => {
                 setSendingState(false);
+                setMessageState("");
             }, 701);
         }
     }

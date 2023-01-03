@@ -1,13 +1,15 @@
+import classNames from "classnames";
 import styles from "./Message.module.scss";
 
 
 interface Props {
     message?: string,
-    owner: 'you' | 'other'
+    owner: 'you' | 'other',
+    sendedNow: boolean
 }
 
 export default function Message(props: Props) {
-    const youContainerStyle = {
+    let youContainerStyle = {
         alignSelf: 'flex-end'
     };
     
@@ -17,8 +19,8 @@ export default function Message(props: Props) {
         color: 'white',
     };
 
-    const otherContainerStyle = {
-        alignSelf: 'flex-start',
+    let otherContainerStyle = {
+        alignSelf: 'flex-start'
     };
 
     const otherMessageStyle = {
@@ -30,7 +32,10 @@ export default function Message(props: Props) {
 
     return (
         <li 
-            className={styles.message}
+            className={classNames({
+                [styles.message]: true,
+                [styles['message--sendedNow']]: props.sendedNow
+            })}
             style={ props.owner === 'you' ? youContainerStyle : otherContainerStyle}
         >
             <p 

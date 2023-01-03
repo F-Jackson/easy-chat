@@ -5,7 +5,8 @@ type TMessage = {
     id: string,
     user: string,
     message: string,
-    date: Date
+    date: Date,
+    sendedNow: boolean
 }
 
 interface IMessages {
@@ -24,3 +25,4 @@ const messagesAtom = atom({
 });
 
 export { messagesAtom };
+export type { TMessage };

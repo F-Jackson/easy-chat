@@ -6,7 +6,7 @@ import { chatSelectedAtom } from "../../../../../../../../States/chatsSelected";
 import { useState } from "react";
 import axios from "axios";
 import { jwtTokenAtom } from "../../../../../../../../States/user";
-import { messagesAtom } from "../../../../../../../../States/messages";
+import { TMessage, messagesAtom } from "../../../../../../../../States/messages";
 import { errorAtom } from "../../../../../../../../States/error";
 
 
@@ -71,7 +71,15 @@ export default function Chat(props: Props) {
                 'token': jwtToken
             }
         }).then(response => {
-            const messages = response.data['messages'];
+            const messages = response.data['messages'].map((msg: TMessage) => (
+                {
+                    id: msg.id,
+                    user: msg.user,
+                    message: msg.message,
+                    date: msg.date,
+                    sendedNow: false
+                }
+            ));
             
             setJwtToken(response.data['token']);
             setMessagesState((_) => {
