@@ -1,3 +1,5 @@
+$from-position-animation: 0px;
+
 .message {
     margin: 0;
     width: 100%;
@@ -21,6 +23,22 @@
             }
             100% {
                 width: 100%;
+            }
+        }
+    }
+
+    &--notSendedNow {
+        animation-name: entry;
+        animation-duration: .5s;
+        animation-iteration-count: 1;
+        animation-fill-mode: forwards;
+
+        @keyframes entry {
+            0% {
+                transform: translateX(var(--from-position-animation));
+            }
+            100% {
+                transform: translateX(0px);
             }
         }
     }

@@ -12,10 +12,10 @@ export default function Messages() {
 
     const bottomRef: any = useRef(null);
 
-
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messagesState]);
+    
 
     return (
         <ul

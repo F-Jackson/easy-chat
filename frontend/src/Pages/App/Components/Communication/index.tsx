@@ -35,8 +35,10 @@ export default function Communication() {
             >
                 chat
             </Button>
-            <Messages />
-            <SendMessage />
+            <div className={styles.messages__container}>
+                <Messages />
+                <SendMessage />
+            </div>
         </>
     );
 }

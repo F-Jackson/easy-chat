@@ -6,7 +6,7 @@ import { jwtTokenAtom, userUsernameAtom } from "../../../../../../States/user";
 import axios from "axios";
 import Input from "../../../../../../Components/Input";
 import Button from "../../../../../../Components/Button";
-import chats from "../../../../../../FakeData/chats.json";
+import { messagesAtom } from "../../../../../../States/messages";
 import { chatSelectedAtom } from "../../../../../../States/chatsSelected";
 import { errorAtom } from "../../../../../../States/error";
 
@@ -23,6 +23,7 @@ export default function Chats() {
     
     const [jwtToken, setJwtToken] = useRecoilState(jwtTokenAtom);
     const [chatSelectedState, setChatSelectedState] = useRecoilState(chatSelectedAtom);
+    const [messagesState, setMessagesState] = useRecoilState(messagesAtom);
     const userUsernameState = useRecoilValue(userUsernameAtom);
     const errorsState = useSetRecoilState(errorAtom);
 
@@ -31,6 +32,16 @@ export default function Chats() {
             errorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
         } else {
             errorsState((_) => []);
+        }
+    }
+
+    function _cleanMessagesState() {
+        if(messagesState.chatId && chatSelectedState.includes(messagesState.chatId)) {
+            setMessagesState({
+                chatId: undefined,
+                talkingTo: undefined,
+                messages: []
+            });
         }
     }
 
@@ -46,6 +57,9 @@ export default function Chats() {
             setJwtToken(response.data['token']);
 
             const newsChats = chatsState.filter(chat => !(chatSelectedState.includes(chat.id)));
+
+            _cleanMessagesState();
+
             setChatSelectedState([]);
 
             setChatsState(newsChats);

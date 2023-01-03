@@ -10,9 +10,10 @@ interface Props {
 
 export default function Message(props: Props) {
     let youContainerStyle = {
-        alignSelf: 'flex-end'
+        alignSelf: 'flex-end',
+        '--from-position-animation': '300px'
     };
-    
+
     const youMessageStyle = {
         border: 'solid #2A3990 2px',
         backgroundColor: '#2A3990',
@@ -20,7 +21,8 @@ export default function Message(props: Props) {
     };
 
     let otherContainerStyle = {
-        alignSelf: 'flex-start'
+        alignSelf: 'flex-start',
+        '--from-position-animation': '-300px'
     };
 
     const otherMessageStyle = {
@@ -34,11 +36,12 @@ export default function Message(props: Props) {
         <li 
             className={classNames({
                 [styles.message]: true,
-                [styles['message--sendedNow']]: props.sendedNow
+                [styles['message--sendedNow']]: props.sendedNow,
+                [styles['message--notSendedNow']]: !props.sendedNow,
             })}
             style={ props.owner === 'you' ? youContainerStyle : otherContainerStyle}
         >
-            <p 
+            <p
                 className={styles.message__text}
                 style={ props.owner === 'you' ? youMessageStyle : otherMessageStyle}
             >
