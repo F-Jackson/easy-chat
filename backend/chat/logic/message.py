@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from chat.logic._common import request_data_field, send_error
 from chat.models import MessagesModel, ChatModel
-from chat.serializers import MessageSerializer
+from chat.serializers import MessageSerializer, MessageCreateSerializer
 
 
 def get_chat_messages(data: dict, user: User, chat_id: int) -> Response:
@@ -109,6 +109,8 @@ def _create_message_in_db(data: dict, chat: ChatModel, message: bytes, user: Use
     )
 
     msg.save()
+
+    data['message'] = MessageCreateSerializer(msg).data
 
     return Response(data, status=status.HTTP_201_CREATED)
 

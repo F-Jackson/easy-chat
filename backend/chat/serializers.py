@@ -26,3 +26,9 @@ class SMessages(serializers.Serializer):
     user = serializers.CharField()
     message = serializers.CharField()
     date = serializers.DateTimeField()
+
+
+class MessageCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MessagesModel
+        exclude = ['message']

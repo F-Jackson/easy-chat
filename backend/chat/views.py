@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from chat.logic._common import invalid_token
 from chat.logic.chat import get_chat_info, create_new_chat, destroy_chat
 from chat.logic.message import get_chat_messages, create_message, detroy_message
-from chat.serializers import SMessages, SChats
+from chat.serializers import MessageCreateSerializer, SChats, SMessages
 
 from jwt_auth.user_auth import verify_user_auth
 
@@ -108,7 +108,7 @@ class MessagesView(APIView):
                               type=openapi.TYPE_STRING, required=True),
         ],
         responses={
-            200: openapi.Response("Retrives new client token"),
+            200: openapi.Response("Retrives new client token and message info", MessageCreateSerializer),
             400: openapi.Response("Retrives new client token"),
             404: openapi.Response("Retrives new client token"),
             401: openapi.Response("If authenticated retrives new client token")
