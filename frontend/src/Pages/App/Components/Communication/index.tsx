@@ -3,9 +3,15 @@ import Messages from "./Components/Messages";
 import SendMessage from "./Components/SendMessage";
 import { MeetingProvider, useMeeting } from "@videosdk.live/react-sdk";
 import styles from "./Communication.module.scss";
+import DeleteMessages from "./Components/DeleteMessages";
+import { useRecoilValue } from "recoil";
+import { messagesSelectedAtom } from "../../../../States/messagesSelected";
 
 
 export default function Communication() {
+    const messagesSelectedState = useRecoilValue(messagesSelectedAtom);
+
+
     return (
         <>
             <div>
@@ -37,7 +43,7 @@ export default function Communication() {
             </Button>
             <div className={styles.messages__container}>
                 <Messages />
-                <SendMessage />
+                { messagesSelectedState.length > 0 ? <DeleteMessages /> : <SendMessage /> }
             </div>
         </>
     );

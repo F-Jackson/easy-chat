@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../../../../../../Components/Button";
 import Input from "../../../../../../Components/Input";
 import { BiMailSend } from "react-icons/bi";
@@ -8,7 +8,7 @@ import axios from "axios";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { messagesAtom } from "../../../../../../States/messages";
 import { jwtTokenAtom, userUsernameAtom } from "../../../../../../States/user";
-import uniqid from "uniqid";
+import { inputMessagesAtom } from "../../../../../../States/inputMessage";
 
 
 export default function SendMessage() {
@@ -17,8 +17,8 @@ export default function SendMessage() {
 
     const [messagesState, setMessagesState] = useRecoilState(messagesAtom);
     const [jwtToken, setJwtToken] = useRecoilState(jwtTokenAtom);
+    const [inputMessagesState, setInputMessagesState] = useRecoilState(inputMessagesAtom);
     const userUsernameState = useRecoilValue(userUsernameAtom);
-
 
     function sendMessage(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -37,7 +37,7 @@ export default function SendMessage() {
                 }
             }).then(response => {
                 const newMessage = {
-                    id: uniqid(),
+                    id: response.data['message'].id,
                     user: userUsernameState,
                     message: message,
                     date: new Date(),
@@ -64,6 +64,30 @@ export default function SendMessage() {
             }, 701);
         }
     }
+
+    useEffect(() => {
+        const chatId = messagesState.chatId;
+
+        const old = inputMessagesState.filter(inputMsg => inputMsg.chatId !== chatId);
+
+        const newMsg = {
+            chatId: chatId as number,
+            message: messageState
+        }
+
+        setInputMessagesState((_) => [...old, newMsg]);
+    }, [messageState]);
+
+    useEffect(() => {
+        const chatId = messagesState.chatId;
+
+        const message = inputMessagesState.find(inputMsg => inputMsg.chatId === chatId);
+        
+        if(message) {
+            setMessageState(message.message);
+        }
+    }, [messagesState]);
+
 
     return (
         <section

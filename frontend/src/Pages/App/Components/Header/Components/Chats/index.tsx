@@ -1,6 +1,6 @@
 import styles from "./Chats.module.scss";
 import Chat from "./Components/Chat";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { jwtTokenAtom, userUsernameAtom } from "../../../../../../States/user";
 import axios from "axios";
@@ -9,6 +9,8 @@ import Button from "../../../../../../Components/Button";
 import { messagesAtom } from "../../../../../../States/messages";
 import { chatSelectedAtom } from "../../../../../../States/chatsSelected";
 import { errorAtom } from "../../../../../../States/error";
+import { messagesSelectedAtom } from "../../../../../../States/messagesSelected";
+import { inputMessagesAtom } from "../../../../../../States/inputMessage";
 
 
 interface IChat {
@@ -24,8 +26,16 @@ export default function Chats() {
     const [jwtToken, setJwtToken] = useRecoilState(jwtTokenAtom);
     const [chatSelectedState, setChatSelectedState] = useRecoilState(chatSelectedAtom);
     const [messagesState, setMessagesState] = useRecoilState(messagesAtom);
+    const setMessagesSelectedState = useSetRecoilState(messagesSelectedAtom);
     const userUsernameState = useRecoilValue(userUsernameAtom);
     const errorsState = useSetRecoilState(errorAtom);
+    const setInputMessagesState = useSetRecoilState(inputMessagesAtom);
+
+    const bottomRef: any = useRef(null);
+
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [chatsState]);
 
     function _Error(error: any) {
         if('response' in error && 'error' in error.response.data) {
@@ -46,6 +56,8 @@ export default function Chats() {
     }
 
     function _deleteChats() {
+        setMessagesSelectedState([]);
+
         axios.delete(`http://127.0.0.1:8000/chats/`, {
             headers: {
                 'token': jwtToken
@@ -92,6 +104,8 @@ export default function Chats() {
     }
 
     function _GetChats() {
+        setMessagesSelectedState([]);
+
         axios.get('http://127.0.0.1:8000/chats/', {
             headers: {
                 'token': jwtToken
@@ -99,6 +113,13 @@ export default function Chats() {
         }).then(response => {
             const chats: IChat[] = response.data['chats'];
             setChatsState((_) => chats);
+
+            setInputMessagesState((_) => chats.map(chat => {
+                return {
+                    chatId: chat.id,
+                    message: ""
+                }
+            }));
 
             setJwtToken((_) => response.data['token']);
         }).catch(error => {
@@ -133,6 +154,7 @@ export default function Chats() {
                         />
                     </li>
                 )) }
+                <div ref={bottomRef} />
             </ul>
             <section
                 className={styles.chatForm}

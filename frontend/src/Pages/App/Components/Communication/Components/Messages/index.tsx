@@ -24,6 +24,7 @@ export default function Messages() {
             {
                 messagesState.messages?.map(message => (
                     <Message
+                        id={message.id}
                         message={message.message}
                         owner={message.user === userUsernameState ? "you" : "other"}
                         sendedNow={message.sendedNow}

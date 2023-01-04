@@ -11,7 +11,7 @@ type TMessage = {
 
 interface IMessages {
     chatId: number | undefined,
-    talkingTo: string | undefined,
+    talkingTo: string | undefined
     messages: TMessage[]
 }
 

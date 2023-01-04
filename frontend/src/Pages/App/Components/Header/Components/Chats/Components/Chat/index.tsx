@@ -1,13 +1,13 @@
 import { useRecoilState, useSetRecoilState } from "recoil";
-import useLongPress from "../../../../../../../../Hooks/longPress";
 import styles from "./Chat.module.scss";
-import { MdOutlineWhatshot } from "react-icons/md";
 import { chatSelectedAtom } from "../../../../../../../../States/chatsSelected";
-import { useState } from "react";
 import axios from "axios";
 import { jwtTokenAtom } from "../../../../../../../../States/user";
 import { TMessage, messagesAtom } from "../../../../../../../../States/messages";
 import { errorAtom } from "../../../../../../../../States/error";
+import Selectable from "../../../../../../../../Components/Selectable";
+import { BiTrash } from "react-icons/bi";
+import { messagesSelectedAtom } from "../../../../../../../../States/messagesSelected";
 
 
 interface Props {
@@ -17,19 +17,19 @@ interface Props {
 }
 
 export default function Chat(props: Props) {
-    const [clickedState, setClickedState] = useState(false);
-    const [timerId, setTimerId] = useState<NodeJS.Timeout | undefined>();
-
-    const backspaceLongPress = useLongPress(() => AddChatToDeleteList(), 500, () => HandlesClick(), clickedState);
     const [chatSelectedState, setChatSelectedState] = useRecoilState(chatSelectedAtom);
     const [jwtToken, setJwtToken] = useRecoilState(jwtTokenAtom);
     const setMessagesState = useSetRecoilState(messagesAtom);
     const setErrorsState = useSetRecoilState(errorAtom);
+    const setMessagesSelectedState = useSetRecoilState(messagesSelectedAtom);
 
-    let newStyles = {
-        borderTop: "solid white 2px"
-    } as React.CSSProperties;
+    const newStylesContainer = {
+        borderColor: 'rgb(133, 0, 0)'
+    };
 
+    const newStylesTrash = {
+        color: 'rgb(133, 0, 0)'
+    };
 
     function _Error(error: any) {
         if('response' in error && 'error' in error.response.data) {
@@ -49,15 +49,7 @@ export default function Chat(props: Props) {
         }
     }
 
-    function _HandlePress() {
-        setClickedState(true);
-
-        clearInterval(timerId);
-        setTimerId(setTimeout(() => setClickedState(false), 1000));
-    }
-
     function AddChatToDeleteList() {
-        _HandlePress();
         if(!(chatSelectedState.includes(props.id))){
             setChatSelectedState((old) => [...old, props.id]);
         } else {
@@ -66,6 +58,8 @@ export default function Chat(props: Props) {
     }
 
     function OpenChat() {
+        setMessagesSelectedState([]);
+
         axios.get(`http://127.0.0.1:8000/messages/chat/${props.id}`, {
             headers: {
                 'token': jwtToken
@@ -91,13 +85,11 @@ export default function Chat(props: Props) {
                 return newMessages;
             });
         }).catch(error => {
-            console.log(error);
             _Error(error);
         });
     }
 
-    function HandlesClick() {
-        _HandlePress();
+    function HandleClick() {
         if(!(chatSelectedState.includes(props.id))){
             OpenChat();
         } else {
@@ -107,11 +99,13 @@ export default function Chat(props: Props) {
 
 
     return (
-        <button
+        <Selectable
             title="Open chat"
             className={styles.chat}
-            {...backspaceLongPress}
-            style={ chatSelectedState.includes(props.id) ? newStyles : {} as React.CSSProperties}
+            handleClick={HandleClick}
+            handleHold={AddChatToDeleteList}
+            holdTime={250}
+            newStyles={chatSelectedState.includes(props.id) ? newStylesContainer : {}}
         >
             <img 
                 src="" 
@@ -123,16 +117,10 @@ export default function Chat(props: Props) {
             >
                 {props.name}
             </p>
-            {
-                props.newMessages ?
-                <p
-                    className={styles.newMsg}
-                >
-                    {props.newMessages}
-                    <MdOutlineWhatshot />
-                </p>
-                : <></>
-            }
-        </button>
+            <BiTrash 
+                className={styles.trash}
+                style={chatSelectedState.includes(props.id) ? newStylesTrash : {}}
+            />
+        </Selectable>
     );
 }
