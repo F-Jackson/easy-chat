@@ -38,7 +38,7 @@ urlpatterns = [
 chats_urls = (
     path('chats/', ChatsView.as_view(), name='chats_view'),
     path('messages/', MessagesView.as_view(), name='messages_view'),
-    path('messages/chat/<int:pk>', MessagesListView.as_view(), name='messages_list_view')
+    path('messages/chat/<int:pk>/page:<int:page>/', MessagesListView.as_view(), name='messages_list_view')
 )
 
 docs_urls = (

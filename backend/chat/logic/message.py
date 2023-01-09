@@ -4,12 +4,13 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 
+from chat.constants.messages import PAGINATION_SIZE
 from chat.logic._common import request_data_field, send_error
 from chat.models import MessagesModel, ChatModel
 from chat.serializers import MessageSerializer, MessageCreateSerializer
 
 
-def get_chat_messages(data: dict, user: User, chat_id: int) -> Response:
+def get_chat_messages(data: dict, user: User, chat_id: int, page: int) -> Response:
     try:
         chat = ChatModel.objects.get(pk=chat_id)
 
@@ -22,7 +23,9 @@ def get_chat_messages(data: dict, user: User, chat_id: int) -> Response:
         return send_error(data, 'User is not the owner of this chat', status.HTTP_401_UNAUTHORIZED)
     else:
         priv_key = getattr(chat, 'priv_key')
-        messages = MessagesModel.objects.filter(chat=chat)
+        current_pages = page * PAGINATION_SIZE
+
+        messages = MessagesModel.objects.filter(chat=chat)[current_pages - PAGINATION_SIZE:current_pages]
 
         messages_data = _get_messages_data(messages, priv_key)
 

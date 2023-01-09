@@ -164,7 +164,9 @@ class MessagesListView(APIView):
         manual_parameters=[
             openapi.Parameter("token", openapi.IN_HEADER, description="Client Jwt Token",
                               type=openapi.TYPE_STRING, required=True),
-            openapi.Parameter("chat", openapi.IN_QUERY, description="Chat id that you to see the messages",
+            openapi.Parameter("<chat>", openapi.IN_QUERY, description="Chat id that you to see the messages",
+                              type=openapi.TYPE_NUMBER, required=True),
+            openapi.Parameter("page:<page>", openapi.IN_QUERY, description="Number of the page to get messages",
                               type=openapi.TYPE_NUMBER, required=True),
         ],
         responses={
@@ -174,7 +176,7 @@ class MessagesListView(APIView):
             401: openapi.Response("If authenticated retrives new client token")
         }
     )
-    def get(self, request, pk=None) -> Response:
+    def get(self, request, pk=None, page=None) -> Response:
         jwt_is_valid = verify_user_auth(request, True)
 
         if jwt_is_valid and pk is not None:
@@ -183,7 +185,7 @@ class MessagesListView(APIView):
             data = {
                 'token': token
             }
-            return get_chat_messages(data, user, pk)
+            return get_chat_messages(data, user, pk, page)
         return invalid_token()
 
 
