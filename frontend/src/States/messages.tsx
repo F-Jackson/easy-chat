@@ -9,20 +9,23 @@ type TMessage = {
     sendedNow: boolean
 }
 
-interface IMessages {
+interface IMessagesInfo {
     chatId: number | undefined,
-    talkingTo: string | undefined
-    messages: TMessage[]
+    talkingTo: string | undefined,
 }
+
+const messagesInfoAtom = atom({
+    key: "messagesInfoAtom",
+    default: {
+        chatId: undefined,
+        talkingTo: undefined
+    } as IMessagesInfo
+});
 
 const messagesAtom = atom({
     key: "messagesAtom",
-    default: {
-        chatId: undefined,
-        talkingTo: undefined,
-        messages: []
-    } as IMessages
+    default: [] as TMessage[]
 });
 
-export { messagesAtom };
+export { messagesAtom, messagesInfoAtom };
 export type { TMessage };

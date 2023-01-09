@@ -5,20 +5,21 @@ import Header from './Components/Header';
 import Introdution from './Components/Introdution';
 import { useRecoilValue } from "recoil";
 import styles from './App.module.scss';
-import { messagesAtom } from '../../States/messages';
+import { messagesInfoAtom } from '../../States/messages';
+import ApiRefresh from './Components/ApiRefresh';
 
-
-export default function App() {
+export default function App() {    
     const errorState = useRecoilValue(errorAtom);
-    const messagesState = useRecoilValue(messagesAtom);
+    const messagesInfoState = useRecoilValue(messagesInfoAtom);
 
     return (
         <>
             <Header />
             { errorState.length > 0 ? <Alert errors={errorState}/> : <></>}
             <main className={styles.main}>
-                { messagesState.chatId ? <Communication /> : <Introdution /> }
+                { messagesInfoState.chatId ? <Communication /> : <Introdution /> }
             </main>
+            <ApiRefresh />
         </>
     );
 }

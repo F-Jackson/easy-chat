@@ -1,5 +1,6 @@
 import rsa
 from django.contrib.auth.models import User
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -93,7 +94,7 @@ def _valid_serializer(user: User, chat: ChatModel, message: bytes) -> MessageSer
     data_to_valid = {
         'user': user.pk,
         'chat': chat.pk,
-        'message': message
+        'message': message,
     }
 
     serializer = MessageSerializer(data=data_to_valid)
@@ -105,12 +106,17 @@ def _create_message_in_db(data: dict, chat: ChatModel, message: bytes, user: Use
     msg = MessagesModel.objects.create(
         user=user,
         chat=chat,
-        message=message
+        message=message,
+        date=timezone.now()
     )
 
     msg.save()
 
     data['message'] = MessageCreateSerializer(msg).data
+
+    chat.last_message = msg.date
+
+    chat.save()
 
     return Response(data, status=status.HTTP_201_CREATED)
 

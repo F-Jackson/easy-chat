@@ -3,7 +3,7 @@ import styles from "./Chat.module.scss";
 import { chatSelectedAtom } from "../../../../../../../../States/chatsSelected";
 import axios from "axios";
 import { jwtTokenAtom } from "../../../../../../../../States/user";
-import { TMessage, messagesAtom } from "../../../../../../../../States/messages";
+import { TMessage, messagesAtom, messagesInfoAtom } from "../../../../../../../../States/messages";
 import { errorAtom } from "../../../../../../../../States/error";
 import Selectable from "../../../../../../../../Components/Selectable";
 import { BiTrash } from "react-icons/bi";
@@ -14,6 +14,8 @@ interface Props {
     id: number,
     name: string,
     newMessages: number,
+    timerId: NodeJS.Timeout | undefined,
+    setTimerId: React.Dispatch<React.SetStateAction<NodeJS.Timeout | undefined>>
 }
 
 export default function Chat(props: Props) {
@@ -22,6 +24,7 @@ export default function Chat(props: Props) {
     const setMessagesState = useSetRecoilState(messagesAtom);
     const setErrorsState = useSetRecoilState(errorAtom);
     const setMessagesSelectedState = useSetRecoilState(messagesSelectedAtom);
+    const setMessagesInfoState = useSetRecoilState(messagesInfoAtom);
 
     const newStylesContainer = {
         borderColor: 'rgb(133, 0, 0)'
@@ -65,25 +68,28 @@ export default function Chat(props: Props) {
                 'token': jwtToken
             }
         }).then(response => {
+            clearTimeout(props.timerId);
+
             const messages = response.data['messages'].map((msg: TMessage) => (
                 {
                     id: msg.id,
                     user: msg.user,
                     message: msg.message,
-                    date: msg.date,
+                    date: new Date(msg.date),
                     sendedNow: false
                 }
             ));
             
             setJwtToken(response.data['token']);
-            setMessagesState((_) => {
-                const newMessages = {
+
+            setMessagesInfoState((_) => {
+                return {
                     chatId: props.id,
                     talkingTo: props.name,
-                    messages: messages
                 };
-                return newMessages;
             });
+
+            setMessagesState(messages);
         }).catch(error => {
             _Error(error);
         });

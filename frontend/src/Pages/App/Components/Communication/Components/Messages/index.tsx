@@ -1,20 +1,23 @@
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import Message from "./Components/Message";
 import styles from "./Messages.module.scss";
-import { messagesAtom } from "../../../../../../States/messages";
+import { messagesAtom, messagesInfoAtom } from "../../../../../../States/messages";
 import { userUsernameAtom } from "../../../../../../States/user";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 
-export default function Messages() {
-    const messagesState = useRecoilValue(messagesAtom);
+interface Props {
+    bottomRef: any
+}
+
+export default function Messages(props: Props) {
+    const [messagesState, setMessagesState] = useRecoilState(messagesAtom);
+    const messagesInfoState = useRecoilValue(messagesInfoAtom);
     const userUsernameState = useRecoilValue(userUsernameAtom);
 
-    const bottomRef: any = useRef(null);
-
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messagesState]);
+        props.bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messagesInfoState.chatId]);
     
 
     return (
@@ -22,7 +25,7 @@ export default function Messages() {
             className={styles.messages}
         >
             {
-                messagesState.messages?.map(message => (
+                messagesState?.map(message => (
                     <Message
                         id={message.id}
                         message={message.message}
@@ -33,7 +36,7 @@ export default function Messages() {
                 ))
             }
 
-            <div ref={bottomRef} />
+            <div ref={props.bottomRef} />
         </ul>
     );
 }

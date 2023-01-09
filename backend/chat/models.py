@@ -1,4 +1,3 @@
-import rsa
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -18,6 +17,7 @@ class ChatModel(models.Model):
         unique=False, related_name='user_2_id',
         related_query_name='user_2_id'
     )
+    last_message = models.DateTimeField(default=timezone.now)
 
 
 class MessagesModel(models.Model):
@@ -30,4 +30,4 @@ class MessagesModel(models.Model):
         unique=False
     )
     message = models.BinaryField()
-    date = models.DateTimeField(default=timezone.now())
+    date = models.DateTimeField(default=timezone.now)

@@ -33,17 +33,11 @@ export default function DeleteMessages() {
         }).then(response => {
             setJwtToken(response.data['token']);
 
-            const newsMessages = messagesState.messages.filter(message => !(messagesSelectedState.includes(message.id)));
-
-            const newMsgs = {
-                chatId: messagesState.chatId,
-                talkingTo: messagesState.talkingTo,
-                messages: newsMessages
-            }
+            const newMessages = messagesState.filter(message => !(messagesSelectedState.includes(message.id)));
 
             setMessagesSelectedState([]);
 
-            setMessagesState(newMsgs);
+            setMessagesState(newMessages);
         }).catch(error => {
             _Error(error);
         });

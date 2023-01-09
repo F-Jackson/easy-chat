@@ -3,11 +3,13 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
 
 from chat.logic._common import invalid_token
 from chat.logic.chat import get_chat_info, create_new_chat, destroy_chat
+from chat.logic.last_message import get_all_last_messages
 from chat.logic.message import get_chat_messages, create_message, detroy_message
-from chat.serializers import MessageCreateSerializer, SChats, SMessages
+from chat.serializers import MessageCreateSerializer, SChats, SMessages, LastMessagesSerializer
 
 from jwt_auth.user_auth import verify_user_auth
 
@@ -182,4 +184,30 @@ class MessagesListView(APIView):
                 'token': token
             }
             return get_chat_messages(data, user, pk)
+        return invalid_token()
+
+
+class LastMessagesView(ViewSet):
+    @swagger_auto_schema(
+        operation_summary="Get Last Messages List",
+        operation_description="Get all Last Messages from the given User and the User is authenticated and is the "
+                              "owner of the chat",
+        manual_parameters=[
+            openapi.Parameter("token", openapi.IN_HEADER, description="Client Jwt Token",
+                              type=openapi.TYPE_STRING, required=True)
+        ],
+        responses={
+            200: openapi.Response("Retrives new client token and a list of Last Messages", LastMessagesSerializer),
+        }
+    )
+    def list(self, request) -> Response:
+        jwt_is_valid = verify_user_auth(request, True)
+
+        if jwt_is_valid:
+            token, user = jwt_is_valid
+
+            data = {
+                'token': token
+            }
+            return get_all_last_messages(data, user)
         return invalid_token()

@@ -14,7 +14,7 @@ class UserHistoryCallModel(models.Model):
         unique=False, related_name='to_user',
         related_query_name='to_user'
     )
-    start = models.DateTimeField(default=timezone.now())
+    start = models.DateTimeField(default=timezone.now)
     end = models.DateTimeField(null=True, blank=True)
     denied = models.BooleanField(default=False)
     already_updated = models.BooleanField(default=False)

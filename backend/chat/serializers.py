@@ -32,3 +32,9 @@ class MessageCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = MessagesModel
         exclude = ['message']
+
+
+class LastMessagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChatModel
+        fields = ['id', 'last_message']

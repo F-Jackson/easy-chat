@@ -6,7 +6,7 @@ import styles from "./SendMessage.module.scss";
 import classNames from "classnames";
 import axios from "axios";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { messagesAtom } from "../../../../../../States/messages";
+import { messagesAtom, messagesInfoAtom } from "../../../../../../States/messages";
 import { jwtTokenAtom, userUsernameAtom } from "../../../../../../States/user";
 import { inputMessagesAtom } from "../../../../../../States/inputMessage";
 
@@ -16,6 +16,7 @@ export default function SendMessage() {
     const [sendingState, setSendingState] = useState(false);
 
     const [messagesState, setMessagesState] = useRecoilState(messagesAtom);
+    const messagesInfoState = useRecoilValue(messagesInfoAtom);
     const [jwtToken, setJwtToken] = useRecoilState(jwtTokenAtom);
     const [inputMessagesState, setInputMessagesState] = useRecoilState(inputMessagesAtom);
     const userUsernameState = useRecoilValue(userUsernameAtom);
@@ -29,7 +30,7 @@ export default function SendMessage() {
             const message = messageState;
 
             axios.post('http://127.0.0.1:8000/messages/', {
-                'chat': messagesState.chatId,
+                'chat': messagesInfoState.chatId,
                 'message': message
             }, {
                 headers: {
@@ -44,15 +45,9 @@ export default function SendMessage() {
                     sendedNow: true
                 };
 
-                const newMessages = {
-                    chatId: messagesState.chatId,
-                    talkingTo: messagesState.talkingTo,
-                    messages: [...messagesState.messages, newMessage]
-                };
-
                 setJwtToken(response.data['token']);
 
-                setMessagesState(newMessages);
+                setMessagesState((old) => [...old, newMessage]);
 
             }).catch(error => {
                 setMessageState("");
@@ -66,7 +61,7 @@ export default function SendMessage() {
     }
 
     useEffect(() => {
-        const chatId = messagesState.chatId;
+        const chatId = messagesInfoState.chatId;
 
         const old = inputMessagesState.filter(inputMsg => inputMsg.chatId !== chatId);
 
@@ -79,7 +74,7 @@ export default function SendMessage() {
     }, [messageState]);
 
     useEffect(() => {
-        const chatId = messagesState.chatId;
+        const chatId = messagesInfoState.chatId;
 
         const message = inputMessagesState.find(inputMsg => inputMsg.chatId === chatId);
         

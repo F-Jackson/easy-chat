@@ -6,26 +6,23 @@ import { jwtTokenAtom, userUsernameAtom } from "../../../../../../States/user";
 import axios from "axios";
 import Input from "../../../../../../Components/Input";
 import Button from "../../../../../../Components/Button";
-import { messagesAtom } from "../../../../../../States/messages";
+import { messagesInfoAtom, messagesAtom } from "../../../../../../States/messages";
 import { chatSelectedAtom } from "../../../../../../States/chatsSelected";
 import { errorAtom } from "../../../../../../States/error";
 import { messagesSelectedAtom } from "../../../../../../States/messagesSelected";
 import { inputMessagesAtom } from "../../../../../../States/inputMessage";
+import { TChats, chatAtom } from "../../../../../../States/chats";
 
-
-interface IChat {
-    id: number,
-    user_1: string,
-    user_2: string
-}
 
 export default function Chats() {
-    const [chatsState, setChatsState] = useState<IChat[]>([]);
     const [formInputState, setFormInputState] = useState("");
+    const [timerId, setTimerId] = useState<NodeJS.Timeout>();
     
     const [jwtToken, setJwtToken] = useRecoilState(jwtTokenAtom);
     const [chatSelectedState, setChatSelectedState] = useRecoilState(chatSelectedAtom);
-    const [messagesState, setMessagesState] = useRecoilState(messagesAtom);
+    const [messagesInfoState, setMessagesInfoState] = useRecoilState(messagesInfoAtom);
+    const setMessagesState = useSetRecoilState(messagesAtom);
+    const [chatsState, setChatsState] = useRecoilState(chatAtom);
     const setMessagesSelectedState = useSetRecoilState(messagesSelectedAtom);
     const userUsernameState = useRecoilValue(userUsernameAtom);
     const errorsState = useSetRecoilState(errorAtom);
@@ -46,12 +43,13 @@ export default function Chats() {
     }
 
     function _cleanMessagesState() {
-        if(messagesState.chatId && chatSelectedState.includes(messagesState.chatId)) {
-            setMessagesState({
+        if(messagesInfoState.chatId && chatSelectedState.includes(messagesInfoState.chatId)) {
+            setMessagesInfoState({
                 chatId: undefined,
                 talkingTo: undefined,
-                messages: []
             });
+
+            setMessagesState([]);
         }
     }
 
@@ -68,7 +66,7 @@ export default function Chats() {
         }).then(response => {
             setJwtToken(response.data['token']);
 
-            const newsChats = chatsState.filter(chat => !(chatSelectedState.includes(chat.id)));
+            const newsChats = chatsState?.filter(chat => !(chatSelectedState.includes(chat.id)));
 
             _cleanMessagesState();
 
@@ -111,7 +109,7 @@ export default function Chats() {
                 'token': jwtToken
             }
         }).then(response => {
-            const chats: IChat[] = response.data['chats'];
+            const chats: TChats = response.data['chats'];
             setChatsState((_) => chats);
 
             setInputMessagesState((_) => chats.map(chat => {
@@ -151,6 +149,8 @@ export default function Chats() {
                             id={chat.id}
                             name={ userUsernameState === chat.user_1 ? chat.user_2 : chat.user_1}
                             newMessages={0}
+                            timerId={timerId}
+                            setTimerId={setTimerId}
                         />
                     </li>
                 )) }
