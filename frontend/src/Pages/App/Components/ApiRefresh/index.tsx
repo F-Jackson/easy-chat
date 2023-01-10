@@ -4,7 +4,7 @@ import { errorAtom } from "../../../../States/error";
 import { useEffect } from "react";
 import axios from "axios";
 import { TMessage, messagesAtom, messagesInfoAtom } from "../../../../States/messages";
-import { TChats, chatAtom } from "../../../../States/chats";
+import { IChat, TChats, chatAtom } from "../../../../States/chats";
 import { chatSelectedAtom } from "../../../../States/chatsSelected";
 import { messagesSelectedAtom } from "../../../../States/messagesSelected";
 import { inputMessagesAtom } from "../../../../States/inputMessage";
@@ -34,7 +34,7 @@ export default function ApiRefresh() {
         }
     }
 
-    function _getMessages() {
+    function _getMessages(lastMessageDate: Date) {
         axios.get(`http://127.0.0.1:8000/messages/chat/${messagesInfoState.chatId}/page:1/`, {
             headers: {
                 'token': jwtToken
@@ -55,21 +55,39 @@ export default function ApiRefresh() {
             const oldMessages = messagesState.filter(msg => !messagesIds.includes(msg.id));
 
             setMessagesState([...oldMessages, ...messages]);
+
+            const newMessageInfo = {
+                chatId: messagesInfoState.chatId,
+                talkingTo: messagesInfoState.talkingTo,
+                lastMessageDate: new Date(lastMessageDate)
+            } 
+
+            setMessagesInfoState(newMessageInfo);
+
+            setMessagesSelectedState((old) => (
+                old.filter(oldId => messagesIds.includes(oldId))
+            ));
         }).catch(error => {
             _Error(error);
         });
     }
 
     function _compareDate(lastMsg: Date, messagesLastDate: Date): boolean {
-        const day = lastMsg.getDate() === messagesLastDate.getDate();
-        const month = lastMsg.getMonth() === messagesLastDate.getMonth();
-        const hours = lastMsg.getHours() === messagesLastDate.getHours();
-        const minutes = lastMsg.getMinutes() === messagesLastDate.getMinutes();
+        const day = lastMsg.getDate() <= messagesLastDate.getDate();
+        const month = lastMsg.getMonth() <= messagesLastDate.getMonth();
+        const hours = lastMsg.getHours() <= messagesLastDate.getHours();
+        const minutes = lastMsg.getMinutes() <= messagesLastDate.getMinutes();
         const seconds = lastMsg.getSeconds() - messagesLastDate.getSeconds();
 
-        const isNotDiference = [day, month, hours, minutes].every(value => value === true);
+        const toCompare = [month, day, hours, minutes];
 
-        if(Math.abs(seconds) > 5 || !isNotDiference) return true;
+        for(let i=0; i<toCompare.length; i++) {
+            if(!toCompare[i]) {
+                return true;
+            };
+        }
+
+        if(Math.abs(seconds) > 2) return true;
         return false;
     }
 
@@ -79,18 +97,13 @@ export default function ApiRefresh() {
 
             if(lastMsg === undefined) return;
 
-            if(messagesState.length === 0) {
-                _getMessages();
-                return;
-            }
-
-            const messagesLastDate = messagesState[messagesState.length - 1].date;
+            const messagesLastDate = messagesInfoState.lastMessageDate;
 
             const diferentDates = _compareDate(lastMsg.last_message, messagesLastDate);
 
             if(!diferentDates) return;
 
-            _getMessages();
+            _getMessages(lastMsg.last_message);
         }
     }
 
@@ -102,7 +115,15 @@ export default function ApiRefresh() {
                 'token': jwtToken
             }
         }).then(response => {
-            const chats: TChats = response.data['chats'];
+            const chats: TChats = response.data['chats'].map((chat: { id: any; user_1: string; user_2: string; last_message: Date }) => {
+                return {
+                    id: chat.id,
+                    user_1: chat.user_1,
+                    user_2: chat.user_2,
+                    lastMessageDate: new Date(chat.last_message),
+                    hasNewChat: false
+                }
+            });
             setChatsState((_) => chats);
 
             setInputMessagesState((_) => chats.map(chat => {
@@ -118,7 +139,45 @@ export default function ApiRefresh() {
         });
     }
 
-    function _verifyUseStateChanged(oldState: number[], newState: number[]): boolean {
+    function _ChatsNewsMessages(lastMessages: ILastMessage[]) {
+        const difLastMsgs = chatsState?.map(chat => chat.hasNewMsg ? 1 : 0);
+
+        const chats = chatsState?.map(chat => {
+            const lastMsgDate = lastMessages.find(lastMsg => lastMsg.id === chat.id);
+            
+            if(lastMsgDate && messagesInfoState.chatId !== chat.id) {
+                const diferentDates = _compareDate(lastMsgDate.last_message, chat.lastMessageDate);
+
+                if(diferentDates) {
+                    return {
+                        id: chat.id,
+                        user_1: chat.user_1,
+                        user_2: chat.user_2,
+                        lastMessageDate: new Date(lastMsgDate.last_message),
+                        hasNewMsg: true
+                    } as IChat
+                }
+            }
+            
+            return {
+                id: chat.id,
+                user_1: chat.user_1,
+                user_2: chat.user_2,
+                lastMessageDate: new Date(chat.lastMessageDate),
+                hasNewMsg: chat.hasNewMsg
+            } as IChat
+        });
+
+        const difNewLastMsgs = chats?.map(chat => chat.hasNewMsg ? 1 : 0);
+
+        if(difLastMsgs && difNewLastMsgs) {
+            if(_verifyUseStateChanged(difLastMsgs, difNewLastMsgs)) {
+                setChatsState((_) => chats);
+            }
+        }
+    }
+
+    function _verifyUseStateChanged(oldState: number[] | boolean[], newState: number[] | boolean[]): boolean {
         if(oldState.length !== newState.length) return true;
 
         const oldStateSorted = oldState.sort();
@@ -138,7 +197,8 @@ export default function ApiRefresh() {
             if (!messagesChatsIdInLastMessages) {
                 setMessagesInfoState({
                     chatId: undefined,
-                    talkingTo: undefined
+                    talkingTo: undefined,
+                    lastMessageDate: new Date()
                 });
 
                 setMessagesState([]);
@@ -177,6 +237,8 @@ export default function ApiRefresh() {
             const lastMessagesIds = lastMessages.map(lastMsg => lastMsg.id);
 
             _verifyChatInBackend(lastMessagesIds);
+
+            _ChatsNewsMessages(lastMessages);
 
             _verifyMessageInfoState(lastMessagesIds);
 

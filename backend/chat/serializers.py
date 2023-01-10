@@ -13,6 +13,7 @@ class SChats(serializers.Serializer):
     id = serializers.IntegerField()
     user_1 = serializers.CharField()
     user_2 = serializers.CharField()
+    last_message = serializers.DateTimeField()
 
 
 class MessageSerializer(serializers.ModelSerializer):

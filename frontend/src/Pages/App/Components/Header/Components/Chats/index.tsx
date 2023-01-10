@@ -47,6 +47,7 @@ export default function Chats() {
             setMessagesInfoState({
                 chatId: undefined,
                 talkingTo: undefined,
+                lastMessageDate: new Date()
             });
 
             setMessagesState([]);
@@ -109,7 +110,15 @@ export default function Chats() {
                 'token': jwtToken
             }
         }).then(response => {
-            const chats: TChats = response.data['chats'];
+            const chats: TChats = response.data['chats'].map((chat: { id: any; user_1: string; user_2: string; last_message: Date }) => {
+                return {
+                    id: chat.id,
+                    user_1: chat.user_1,
+                    user_2: chat.user_2,
+                    lastMessageDate: new Date(chat.last_message),
+                    hasNewChat: false
+                }
+            });
             setChatsState((_) => chats);
 
             setInputMessagesState((_) => chats.map(chat => {
@@ -151,6 +160,8 @@ export default function Chats() {
                             newMessages={0}
                             timerId={timerId}
                             setTimerId={setTimerId}
+                            hasNewChat={chat.hasNewMsg}
+                            lastMessageDate={chat.lastMessageDate}
                         />
                     </li>
                 )) }

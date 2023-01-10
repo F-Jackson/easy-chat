@@ -18,7 +18,8 @@ def get_chat_info(data: dict, user: User) -> Response:
         chat_data = {
             'id': chat_id,
             'user_1': model.user_1_id.username,
-            'user_2': model.user_2_id.username
+            'user_2': model.user_2_id.username,
+            'last_message': model.last_message
         }
 
         data['chats'].append(chat_data)

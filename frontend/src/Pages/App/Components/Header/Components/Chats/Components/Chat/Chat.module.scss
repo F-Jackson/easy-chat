@@ -2,8 +2,8 @@
     width: 100%;
     display: grid;
     grid-template-areas: 
-        "name name"
-        "img trash"
+        "name name name name name newMsg"
+        "img img img trash trash trash"
     ;
     gap: 10px;
     background-color: rgba(255, 255, 255, 0.1);
@@ -33,13 +33,23 @@
 
     .trash {
         grid-area: trash;
-        margin-bottom: 7px;
-        margin-right: 7px;
+        padding: 4px;
         align-self: flex-end;
         justify-self: flex-end;
-        transform: scale(1.1);
+        transform: scale(1);
         color: transparent;
         transition: .25s;
+        border-radius: 5px;
+    }
+
+    .new__message {
+        grid-area: newMsg;
+        background-color: rgb(133, 0, 0);
+        color: white;
+        border-radius: 100px;
+        padding: 4px;
+        transform: scale(0.7);
+        justify-self: flex-end;
     }
 }
 

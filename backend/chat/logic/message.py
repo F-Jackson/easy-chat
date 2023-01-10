@@ -133,6 +133,11 @@ def detroy_message(data: dict, user: User, request_data: dict):
         return send_error(data, 'Request needs a "messages_id_to_delete" list', status.HTTP_400_BAD_REQUEST)
     else:
         for msg in messages:
+            chat = msg.chat
+
+            chat.last_message = timezone.now()
+
+            chat.save()
             msg.delete()
 
         return Response(data, status=status.HTTP_200_OK)

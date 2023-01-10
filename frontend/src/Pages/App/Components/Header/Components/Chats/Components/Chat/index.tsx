@@ -7,7 +7,9 @@ import { TMessage, messagesAtom, messagesInfoAtom } from "../../../../../../../.
 import { errorAtom } from "../../../../../../../../States/error";
 import Selectable from "../../../../../../../../Components/Selectable";
 import { BiTrash } from "react-icons/bi";
+import { FaFire }  from "react-icons/fa";
 import { messagesSelectedAtom } from "../../../../../../../../States/messagesSelected";
+import { chatAtom } from "../../../../../../../../States/chats";
 
 
 interface Props {
@@ -15,7 +17,9 @@ interface Props {
     name: string,
     newMessages: number,
     timerId: NodeJS.Timeout | undefined,
-    setTimerId: React.Dispatch<React.SetStateAction<NodeJS.Timeout | undefined>>
+    setTimerId: React.Dispatch<React.SetStateAction<NodeJS.Timeout | undefined>>,
+    hasNewChat: boolean,
+    lastMessageDate: Date
 }
 
 export default function Chat(props: Props) {
@@ -25,13 +29,15 @@ export default function Chat(props: Props) {
     const setErrorsState = useSetRecoilState(errorAtom);
     const setMessagesSelectedState = useSetRecoilState(messagesSelectedAtom);
     const setMessagesInfoState = useSetRecoilState(messagesInfoAtom);
+    const [chatsState, setChatsState] = useRecoilState(chatAtom);
 
     const newStylesContainer = {
         borderColor: 'rgb(133, 0, 0)'
     };
 
     const newStylesTrash = {
-        color: 'rgb(133, 0, 0)'
+        color: 'white',
+        backgroundColor: 'rgb(133, 0, 0)'
     };
 
     function _Error(error: any) {
@@ -85,6 +91,7 @@ export default function Chat(props: Props) {
                 return {
                     chatId: undefined,
                     talkingTo: undefined,
+                    lastMessageDate: new Date()
                 };
             });
 
@@ -93,11 +100,34 @@ export default function Chat(props: Props) {
                     return {
                         chatId: props.id,
                         talkingTo: props.name,
+                        lastMessageDate: new Date(props.lastMessageDate) 
                     };
                 });
     
                 setMessagesState(messages.reverse());
             }, 300));
+
+            const newsChats = chatsState?.map(chat => {
+                if(chat.id === props.id) {
+                    return {
+                        id: chat.id,
+                        user_1: chat.user_1,
+                        user_2: chat.user_2,
+                        lastMessageDate: chat.lastMessageDate,
+                        hasNewMsg: false
+                    }
+                } else {
+                    return {
+                        id: chat.id,
+                        user_1: chat.user_1,
+                        user_2: chat.user_2,
+                        lastMessageDate: chat.lastMessageDate,
+                        hasNewMsg: chat.hasNewMsg
+                    }
+                }
+            });
+
+            setChatsState(newsChats);
         }).catch(error => {
             _Error(error);
         });
@@ -135,6 +165,12 @@ export default function Chat(props: Props) {
                 className={styles.trash}
                 style={chatSelectedState.includes(props.id) ? newStylesTrash : {}}
             />
+            {
+                props.hasNewChat ? 
+                <FaFire 
+                    className={styles.new__message}
+                /> : <></>
+            }
         </Selectable>
     );
 }
