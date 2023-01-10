@@ -62,8 +62,7 @@ export default function Chat(props: Props) {
 
     function OpenChat() {
         setMessagesSelectedState([]);
-
-        axios.get(`http://127.0.0.1:8000/messages/chat/${props.id}`, {
+        axios.get(`http://127.0.0.1:8000/messages/chat/${props.id}/page:1/`, {
             headers: {
                 'token': jwtToken
             }
@@ -84,12 +83,21 @@ export default function Chat(props: Props) {
 
             setMessagesInfoState((_) => {
                 return {
-                    chatId: props.id,
-                    talkingTo: props.name,
+                    chatId: undefined,
+                    talkingTo: undefined,
                 };
             });
 
-            setMessagesState(messages);
+            props.setTimerId(setTimeout(() => {
+                setMessagesInfoState((_) => {
+                    return {
+                        chatId: props.id,
+                        talkingTo: props.name,
+                    };
+                });
+    
+                setMessagesState(messages.reverse());
+            }, 300));
         }).catch(error => {
             _Error(error);
         });

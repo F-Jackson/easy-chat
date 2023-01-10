@@ -35,13 +35,13 @@ export default function ApiRefresh() {
     }
 
     function _getMessages() {
-        axios.get(`http://127.0.0.1:8000/messages/chat/${messagesInfoState.chatId}`, {
+        axios.get(`http://127.0.0.1:8000/messages/chat/${messagesInfoState.chatId}/page:1/`, {
             headers: {
                 'token': jwtToken
             }
         }).then(response => {
             setJwtToken(response.data['token']);
-            const messages = response.data['messages'].map((msg: TMessage) => (
+            const messages: TMessage[] = response.data['messages'].map((msg: TMessage) => (
                 {
                     id: msg.id,
                     user: msg.user,
@@ -49,9 +49,12 @@ export default function ApiRefresh() {
                     date: new Date(msg.date),
                     sendedNow: false
                 }
-            ));
+            )).reverse();
 
-            setMessagesState(messages);
+            const messagesIds= messages.map(msg => msg.id);
+            const oldMessages = messagesState.filter(msg => !messagesIds.includes(msg.id));
+
+            setMessagesState([...oldMessages, ...messages]);
         }).catch(error => {
             _Error(error);
         });
@@ -75,6 +78,11 @@ export default function ApiRefresh() {
             const lastMsg = lastMessages.find(lastMsg => lastMsg.id === messagesInfoState.chatId);
 
             if(lastMsg === undefined) return;
+
+            if(messagesState.length === 0) {
+                _getMessages();
+                return;
+            }
 
             const messagesLastDate = messagesState[messagesState.length - 1].date;
 

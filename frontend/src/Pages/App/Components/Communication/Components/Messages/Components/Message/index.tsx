@@ -10,7 +10,7 @@ interface Props {
     id: string,
     message?: string,
     owner: 'you' | 'other',
-    sendedNow: boolean
+    sendedNow: boolean,
 }
 
 export default function Message(props: Props) {

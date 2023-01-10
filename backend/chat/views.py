@@ -164,10 +164,6 @@ class MessagesListView(APIView):
         manual_parameters=[
             openapi.Parameter("token", openapi.IN_HEADER, description="Client Jwt Token",
                               type=openapi.TYPE_STRING, required=True),
-            openapi.Parameter("<chat>", openapi.IN_QUERY, description="Chat id that you to see the messages",
-                              type=openapi.TYPE_NUMBER, required=True),
-            openapi.Parameter("page:<page>", openapi.IN_QUERY, description="Number of the page to get messages",
-                              type=openapi.TYPE_NUMBER, required=True),
         ],
         responses={
             200: openapi.Response("Retrives new client token and a list of messages", SMessages),

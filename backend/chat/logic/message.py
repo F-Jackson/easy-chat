@@ -25,7 +25,7 @@ def get_chat_messages(data: dict, user: User, chat_id: int, page: int) -> Respon
         priv_key = getattr(chat, 'priv_key')
         current_pages = page * PAGINATION_SIZE
 
-        messages = MessagesModel.objects.filter(chat=chat)[current_pages - PAGINATION_SIZE:current_pages]
+        messages = MessagesModel.objects.filter(chat=chat).order_by('-date')[current_pages - PAGINATION_SIZE:current_pages]
 
         messages_data = _get_messages_data(messages, priv_key)
 

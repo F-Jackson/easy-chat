@@ -47,7 +47,7 @@ export default function SendMessage() {
 
                 setJwtToken(response.data['token']);
 
-                setMessagesState((old) => [...old, newMessage]);
+                setMessagesState([...messagesState, newMessage]);
 
             }).catch(error => {
                 setMessageState("");
