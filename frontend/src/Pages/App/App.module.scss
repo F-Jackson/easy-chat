@@ -1,4 +1,6 @@
+@import "styles/variables.module.scss";
+
 .main {
-    background-color: rgba(46, 46, 46);
+    background-color: $background--color;
     height: calc(100vh - 55px);
 }

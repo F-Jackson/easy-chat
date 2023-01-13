@@ -9,6 +9,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { messagesAtom, messagesInfoAtom } from "../../../../../../States/messages";
 import { jwtTokenAtom, userUsernameAtom } from "../../../../../../States/user";
 import { inputMessagesAtom } from "../../../../../../States/inputMessage";
+import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
 
 
 export default function SendMessage() {
@@ -20,9 +21,13 @@ export default function SendMessage() {
     const [jwtToken, setJwtToken] = useRecoilState(jwtTokenAtom);
     const [inputMessagesState, setInputMessagesState] = useRecoilState(inputMessagesAtom);
     const userUsernameState = useRecoilValue(userUsernameAtom);
+    const [apiLoadingStatusState, setApiLoadingStatusState] = useRecoilState(apiLoadingStatusAtom);
 
     function sendMessage(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+
+        if(apiLoadingStatusState) return;
+        setApiLoadingStatusState(true);
 
         if(!sendingState) {
             setSendingState(true);
@@ -37,6 +42,7 @@ export default function SendMessage() {
                     'token': jwtToken
                 }
             }).then(response => {
+                setApiLoadingStatusState(false);
                 const newMessage = {
                     id: response.data['message'].id,
                     user: userUsernameState,
@@ -50,6 +56,7 @@ export default function SendMessage() {
                 setMessagesState([...messagesState, newMessage]);
 
             }).catch(error => {
+                setApiLoadingStatusState(false);
                 setMessageState("");
             });
 

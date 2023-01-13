@@ -10,6 +10,9 @@ import { BiTrash } from "react-icons/bi";
 import { FaFire }  from "react-icons/fa";
 import { messagesSelectedAtom } from "../../../../../../../../States/messagesSelected";
 import { chatAtom } from "../../../../../../../../States/chats";
+import variables from 'styles/_variables.module.scss';
+import classNames from "classnames";
+import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
 
 
 interface Props {
@@ -30,17 +33,12 @@ export default function Chat(props: Props) {
     const setMessagesSelectedState = useSetRecoilState(messagesSelectedAtom);
     const setMessagesInfoState = useSetRecoilState(messagesInfoAtom);
     const [chatsState, setChatsState] = useRecoilState(chatAtom);
-
-    const newStylesContainer = {
-        borderColor: 'rgb(133, 0, 0)'
-    };
-
-    const newStylesTrash = {
-        color: 'white',
-        backgroundColor: 'rgb(133, 0, 0)'
-    };
+    const [apiLoadingStatusState, setApiLoadingStatusState] = useRecoilState(apiLoadingStatusAtom);
+    
 
     function _Error(error: any) {
+        setApiLoadingStatusState(false);
+
         if('response' in error && 'error' in error.response.data) {
             setErrorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
         } else {
@@ -67,12 +65,17 @@ export default function Chat(props: Props) {
     }
 
     function OpenChat() {
+        if(apiLoadingStatusState) return;
+        setApiLoadingStatusState(true);
+
         setMessagesSelectedState([]);
+
         axios.get(`http://127.0.0.1:8000/messages/chat/${props.id}/page:1/`, {
             headers: {
                 'token': jwtToken
             }
         }).then(response => {
+            setApiLoadingStatusState(false);
             clearTimeout(props.timerId);
 
             const messages = response.data['messages'].map((msg: TMessage) => (
@@ -145,11 +148,13 @@ export default function Chat(props: Props) {
     return (
         <Selectable
             title="Open chat"
-            className={styles.chat}
+            className={classNames({
+                [styles.chat]: true,
+                [styles['chat--selected']]: chatSelectedState.includes(props.id)
+            })}
             handleClick={HandleClick}
             handleHold={AddChatToDeleteList}
             holdTime={250}
-            newStyles={chatSelectedState.includes(props.id) ? newStylesContainer : {}}
         >
             <img 
                 src="" 
@@ -162,8 +167,10 @@ export default function Chat(props: Props) {
                 {props.name}
             </p>
             <BiTrash 
-                className={styles.trash}
-                style={chatSelectedState.includes(props.id) ? newStylesTrash : {}}
+                className={classNames({
+                    [styles.trash]: true,
+                    [styles['trash--selected']]: chatSelectedState.includes(props.id)
+                })}
             />
             {
                 props.hasNewChat ? 

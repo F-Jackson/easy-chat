@@ -1,11 +1,12 @@
+@import "styles/variables.module.scss";
+
 .input {
     height: 35px;
     border: none;
-    border-radius: 5px;
     font-size: 16px;
     padding: 0px 5px;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white;
+    background-color: $input--background--color;
+    color: $input--color;
     animation-name: entry;
     animation-duration: .9s;
     animation-iteration-count: 1;
@@ -18,7 +19,7 @@
 
     &:-webkit-autofill {
         transition: background-color 5000s ease-in-out 0s;
-        -webkit-text-fill-color: #fff;
+        -webkit-text-fill-color: $input--color;
     }
 }
 
@@ -31,6 +32,6 @@ label {
         border-bottom: 3px solid transparent;
     }
     100% {
-        border-bottom: 3px solid rgb(133, 0, 0);
+        border-bottom: 3px solid $input--border--color;
     }
 }

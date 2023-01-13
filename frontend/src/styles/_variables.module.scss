@@ -1,0 +1,50 @@
+$background--color: #EEEEEE;
+$menu--color: #111;
+$chat--color: rgba(255, 255, 255, 0.1);
+$header--color: black;
+$chats--background--color: rgba(255, 255, 255, 0.05);
+$chats--border--color: rgba(255, 255, 255, 0.05);
+$msgs--background--color: rgba(61, 61, 61, 1);
+$msgs--border--color: black;
+$selected--background--color: #6F1AB6;
+$selected--color: white;
+$input--background--color: rgba(255, 255, 255, 0.1);
+$input--color: white;
+$input--border--color: #6F1AB6;
+$button--background--color: #6F1AB6;
+$button--border--color: #6F1AB6;
+$button--color: white;
+$introdution--text--color: rgb(0, 0, 0);
+$sending--msg--border--color: #6F1AB6;
+$sending--msg--animate--color: #6F1AB6;
+$delete--background--color: #6F1AB6;
+$delete--color: white;
+$eye--not-vizualized: rgba(255, 255, 255, 0.35);
+$eye-vizualized: rgb(78, 211, 78);
+$msg-you-background-color: #3d4da5;
+$msg-you-color: #ffffff;
+$msg-other-background-color: #ffffff;
+$msg-other-color: #000000;
+
+.messages__component {
+    &__you {
+        background-color: $msg-you-background-color;
+        border: $msg-you-background-color 5px solid;
+        color: $msg-you-color;
+    }
+
+    &__other {
+        background-color: $msg-other-background-color;
+        border: $msg-other-background-color 5px solid;
+        color: $msg-other-color;
+    }
+}
+
+.delete__component {
+    background-color: $delete--background--color;
+    color: $delete--color; 
+}
+
+.chat__delete__component {
+    border-color: $delete--background--color;
+}

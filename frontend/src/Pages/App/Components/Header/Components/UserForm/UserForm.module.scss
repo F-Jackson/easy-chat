@@ -1,10 +1,12 @@
+@import "styles/variables.module.scss";
+
 .userForm {
     display: flex;
     flex-direction: column;
     row-gap: 1rem;
     align-items: flex-end;
-    background-color: rgba(255, 255, 255, 0.025);
-    border: rgba(255, 255, 255, 0.075) solid 2px;
+    background-color: $chats--background--color;
+    border: $chats--border--color solid 2px;
     height: max-content;
 
     .form {

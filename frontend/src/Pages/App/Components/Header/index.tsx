@@ -14,6 +14,7 @@ export default function Header() {
 
     const jwtTokenState = useRecoilValue(jwtTokenAtom);
 
+
     function openSideMenu() {
         setSideMenuState((_) => !sideMenuState)
     }

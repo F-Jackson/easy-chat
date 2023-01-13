@@ -12,6 +12,7 @@ import { errorAtom } from "../../../../../../States/error";
 import { messagesSelectedAtom } from "../../../../../../States/messagesSelected";
 import { inputMessagesAtom } from "../../../../../../States/inputMessage";
 import { TChats, chatAtom } from "../../../../../../States/chats";
+import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
 
 
 export default function Chats() {
@@ -27,6 +28,7 @@ export default function Chats() {
     const userUsernameState = useRecoilValue(userUsernameAtom);
     const errorsState = useSetRecoilState(errorAtom);
     const setInputMessagesState = useSetRecoilState(inputMessagesAtom);
+    const [apiLoadingStatusState, setApiLoadingStatusState] = useRecoilState(apiLoadingStatusAtom);
 
     const bottomRef: any = useRef(null);
 
@@ -35,6 +37,8 @@ export default function Chats() {
     }, [chatsState]);
 
     function _Error(error: any) {
+        setApiLoadingStatusState(false);
+
         if('response' in error && 'error' in error.response.data) {
             errorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
         } else {
@@ -55,6 +59,9 @@ export default function Chats() {
     }
 
     function _deleteChats() {
+        if(apiLoadingStatusState) return;
+        setApiLoadingStatusState(true);
+
         setMessagesSelectedState([]);
 
         axios.delete(`http://127.0.0.1:8000/chats/`, {
@@ -65,6 +72,7 @@ export default function Chats() {
                 'chats_id_to_delete': chatSelectedState
             }
         }).then(response => {
+            setApiLoadingStatusState(false);
             setJwtToken(response.data['token']);
 
             const newsChats = chatsState?.filter(chat => !(chatSelectedState.includes(chat.id)));
@@ -80,6 +88,9 @@ export default function Chats() {
     }
 
     function _addChat() {
+        if(apiLoadingStatusState) return;
+        setApiLoadingStatusState(true);
+
         const data = {
             'talk_to': formInputState
         }
@@ -89,6 +100,7 @@ export default function Chats() {
                 'token': jwtToken
             }
         }).then(response => {
+            setApiLoadingStatusState(false);
             setJwtToken(response.data['token']);
             _GetChats();
         }).catch(error => {
@@ -103,6 +115,9 @@ export default function Chats() {
     }
 
     function _GetChats() {
+        if(apiLoadingStatusState) return;
+        setApiLoadingStatusState(true);
+
         setMessagesSelectedState([]);
 
         axios.get('http://127.0.0.1:8000/chats/', {
@@ -110,6 +125,7 @@ export default function Chats() {
                 'token': jwtToken
             }
         }).then(response => {
+            setApiLoadingStatusState(false);
             const chats: TChats = response.data['chats'].map((chat: { id: any; user_1: string; user_2: string; last_message: Date }) => {
                 return {
                     id: chat.id,

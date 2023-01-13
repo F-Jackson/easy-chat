@@ -2,7 +2,7 @@ import { atom } from "recoil";
 
 
 type TMessage = {
-    id: string,
+    id: number,
     user: string,
     message: string,
     date: Date,

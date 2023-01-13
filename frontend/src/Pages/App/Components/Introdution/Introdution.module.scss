@@ -1,3 +1,5 @@
+@import "styles/variables.module.scss";
+
 .introdution {
     display: flex;
     align-items: center;
@@ -5,17 +7,363 @@
     flex-direction: column;
     row-gap: 2rem;
     height: 100%;
+    overflow: hidden;
+
+    .icons__container {
+        position: relative;
+        z-index: 1;
+        width: 180px;
+        height: 250px;
+
+        svg {
+            position: absolute;
+        }
+
+        .box {
+            color: black;
+            bottom: 0;
+            right: 50%;
+            width: 120px;
+            height: 120px;
+            transform: translateX(50%);
+            z-index: 7;
+            animation-name: box-entry;
+            animation-duration: 2s;
+            animation-iteration-count: 1;
+            animation-fill-mode: forwards;
+
+            @keyframes box-entry {
+                0% {
+                    transform: translate(50%, 0px);
+                }
+                27% {
+                    transform: translate(50%, -50px);
+                }
+                40% {
+                    transform: translate(50%, -50px);
+                }
+                50% {
+                    transform: translate(50%, 0px);
+                }
+                100% {
+                    transform: translate(50%, 0px);
+                }
+            }
+        }
+        
+        .chat {
+            color: $msg-you-background-color;
+            width: 95px;
+            height: 95px;
+            z-index: 2; 
+            bottom: 65%;
+            left: 50%;
+            transform: translate(-50%, 50%);
+            animation-name: chat-entry;
+            animation-duration: 2s;
+            animation-iteration-count: 1;
+            animation-fill-mode: forwards;
+
+            @keyframes chat-entry {
+                0% {
+                    transform: translate(-50%, 100%) scale(0);
+                }
+                50% {
+                    transform: translate(-50%, 100%) scale(0);
+                }
+                54% {
+                    transform: translate(-50%, 100%) scale(.2);
+                }
+                100% {
+                    transform: translate(-50%, 50%) scale(1);
+                }
+            }
+        }
+
+        .pencil {
+            z-index: 5;
+            width: 45px;
+            height: 45px;
+            color: black;
+            animation-name: pencil-entry;
+            animation-duration: 2.8s;
+            animation-iteration-count: 1;
+            animation-fill-mode: forwards;
+
+            @keyframes pencil-entry {
+                0% {
+                    bottom: 30px;
+                    left: 50%;
+                    transform: translateX(-50%) rotate(0deg) scale(0);
+                }
+                50% {
+                    transform: translateX(-50%) rotate(0deg) scale(0);
+                }
+                52% {
+                    bottom: 30px;
+                    left: 50%;
+                    transform: translateX(-50%) rotate(0deg) scale(.2);
+                }
+                100% {
+                    bottom: 74%;
+                    left: 32%;
+                    transform: translate(-50%, 50%) rotate(-80deg) scale(1);
+                }
+            }
+        }
+
+        .gear {
+            z-index: 3;
+            color: black;
+
+            &--1 {
+                width: 24px;
+                height: 24px;
+                animation-name: gear-1-entry;
+                animation-duration: 2s;
+                animation-iteration-count: 1;
+                animation-fill-mode: forwards;
+    
+                @keyframes gear-1-entry {
+                    0% {
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%) scale(0);
+                    }
+                    50% {
+                        transform: translateX(-50%) scale(0);
+                    }
+                    52% {
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%) scale(.2);
+                    }
+                    100% {
+                        bottom: 57%;
+                        left: 73%;
+                        transform: translate(-50%, 50%) scale(1);
+                    }
+                }
+            }
+
+            &--2 {
+                width: 18px;
+                height: 18px;
+                animation-name: gear-2-entry;
+                animation-duration: 2s;
+                animation-iteration-count: 1;
+                animation-fill-mode: forwards;
+    
+                @keyframes gear-2-entry {
+                    0% {
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%) scale(0);
+                    }
+                    50% {
+                        transform: translateX(-50%) scale(0);
+                    }
+                    52% {
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%) scale(.2);
+                    }
+                    100% {
+                        bottom: 78%;
+                        left: 11%;
+                        transform: translate(-50%, 50%) scale(1);
+                    }
+                }
+            }
+        }
+
+        .mail {
+            z-index: 4;
+            color: black;
+
+            &--1 {
+                width: 25px;
+                height: 25px;
+                animation-name: mail-1-entry;
+                animation-duration: 2s;
+                animation-iteration-count: 1;
+                animation-fill-mode: forwards;
+    
+                @keyframes mail-1-entry {
+                    0% {
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%) rotate(0deg) scale(0);
+                    }
+                    50% {
+                        transform: translateX(-50%) scale(0);
+                    }
+                    52% {
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%) rotate(0deg) scale(.2);
+                    }
+                    100% {
+                        bottom: 91%;
+                        left: 81%;
+                        transform: translate(-50%, 50%) rotate(12deg) scale(1);
+                    }
+                }
+            }
+
+            &--2 {
+                width: 32px;
+                height: 32px;
+                animation-name: mail-2-entry;
+                animation-duration: 2s;
+                animation-iteration-count: 1;
+                animation-fill-mode: forwards;
+    
+                @keyframes mail-2-entry {
+                    0% {
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%) rotate(-10deg) scale(0);
+                    }
+                    50% {
+                        transform: translateX(-50%) scale(0);
+                    }
+                    52% {
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%) rotate(-10deg) scale(.2);
+                    }
+                    100% {
+                        bottom: 61%;
+                        left: 7%;
+                        transform: translate(-50%, 50%) rotate(-60deg) scale(1);
+                    }
+                }
+            }
+
+            &--3 {
+                width: 19px;
+                height: 19px;
+                animation-name: mail-3-entry;
+                animation-duration: 2s;
+                animation-iteration-count: 1;
+                animation-fill-mode: forwards;
+    
+                @keyframes mail-3-entry {
+                    0% {
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%) rotate(-50deg) scale(0);
+                    }
+                    50% {
+                        transform: translateX(-50%) scale(0);
+                    }
+                    52% {
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%) rotate(-50deg) scale(.2);
+                    }
+                    100% {
+                        bottom: 91%;
+                        left: 42%;
+                        transform: translate(-50%, 50%) rotate(-10deg) scale(1);
+                    }
+                }
+            }
+
+            &--4 {
+                width: 22px;
+                height: 22px;
+                animation-name: mail-4-entry;
+                animation-duration: 2.4s;
+                animation-iteration-count: 1;
+                animation-fill-mode: forwards;
+    
+                @keyframes mail-4-entry {
+                    0% {
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%) rotate(80deg) scale(0);
+                    }
+                    50% {
+                        transform: translateX(-50%) scale(0);
+                    }
+                    52% {
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%) rotate(80deg) scale(.2);
+                    }
+                    100% {
+                        bottom: 43%;
+                        left: 64%;
+                        transform: translate(-50%, 50%) rotate(31deg) scale(1);
+                    }
+                }
+            }
+
+            &--5 {
+                width: 14px;
+                height: 14px;
+                animation-name: mail-5-entry;
+                animation-duration: 2.25s;
+                animation-iteration-count: 1;
+                animation-fill-mode: forwards;
+    
+                @keyframes mail-5-entry {
+                    0% {
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%) scale(0);
+                    }
+                    50% {
+                        transform: translateX(-50%) scale(0);
+                    }
+                    52% {
+                        bottom: 50px;
+                        left: 50%;
+                        transform: translateX(-50%) scale(.2);
+                    }
+                    100% {
+                        bottom: 100%;
+                        left: 0%;
+                        transform: translate(0%, 0%) scale(1);
+                    }
+                }
+            }
+        }
+    }
 
     .img {
 
     }
 
-    .title {
-        margin: 0;
-        text-align: center;
+    .title__container {
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        row-gap: 8px;
 
-        strong {
+        .title {
+            margin: 0;
+            text-align: center;
+            color: $introdution--text--color;
 
+            strong {
+                font-size: 28px;
+                background-color: $msg-you-background-color;
+                color: $msg-you-color;
+                padding: 0 15px;
+            }
+        }
+
+        .title__line {
+            background-color: $msg-you-background-color;
+            height: 9px;
+            width: 90%;
+
+            &--1 {
+                transform: translateX(80px);
+            }
         }
     }
 }

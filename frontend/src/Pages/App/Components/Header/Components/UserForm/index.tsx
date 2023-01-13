@@ -3,9 +3,10 @@ import Button from "../../../../../../Components/Button";
 import Input from "../../../../../../Components/Input";
 import { useState } from "react";
 import axios from "axios";
-import { useSetRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { jwtTokenAtom, userUsernameAtom } from "../../../../../../States/user";
 import { errorAtom } from "../../../../../../States/error";
+import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
 
 
 interface IRequestData {
@@ -26,8 +27,11 @@ export default function UserForm() {
     const setJwtToken = useSetRecoilState(jwtTokenAtom);
     const errorsState = useSetRecoilState(errorAtom);
     const setUserUsernameState = useSetRecoilState(userUsernameAtom);
+    const [apiLoadingStatusState, setApiLoadingStatusState] = useRecoilState(apiLoadingStatusAtom);
 
     function _Error(error: any) {
+        setApiLoadingStatusState(false);
+
         setJwtToken((_) => "");
         if('response' in error && 'error' in error.response.data) {
             errorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
@@ -41,11 +45,15 @@ export default function UserForm() {
     }
 
     function _GetUserUsername(jwtToken: string) {
+        if(apiLoadingStatusState) return;
+        setApiLoadingStatusState(true);
+
         axios.get('http://127.0.0.1:8000/user/', {
             headers: {
                 'token': jwtToken
             }
         }).then(response => {
+            setApiLoadingStatusState(false);
             setJwtToken(response.data['token']);
 
             const username = response.data['user']['username']
@@ -58,7 +66,11 @@ export default function UserForm() {
     }
 
     function _Login(data: IRequestData) {
+        if(apiLoadingStatusState) return;
+        setApiLoadingStatusState(true);
+
         axios.post('http://127.0.0.1:8000/auth/login/', data).then(response => {
+            setApiLoadingStatusState(false);
             _GetUserUsername(response.data['token']);
 
             setJwtToken(response.data['token']);
@@ -68,7 +80,11 @@ export default function UserForm() {
     }
 
     function _Register(data: IRequestData) {
+        if(apiLoadingStatusState) return;
+        setApiLoadingStatusState(true);
+
         axios.post('http://127.0.0.1:8000/user/', data).then(response => {
+            setApiLoadingStatusState(false);
             _Login(data);
         }).catch(error => {
             _Error(error);

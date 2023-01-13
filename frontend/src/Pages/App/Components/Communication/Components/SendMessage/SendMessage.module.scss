@@ -1,7 +1,11 @@
+@import "styles/variables.module.scss";
+
+
 .sendMessageContainer {
     text-align: center;
     position: relative;
     z-index: 0;
+    width: 100%;
 
     .form {
         display: flex;
@@ -15,13 +19,14 @@
 
 
         input {
-            border-radius: 0px;
             animation-name: inputEntry;
             animation-duration: 1s;
             animation-iteration-count: 1;
             animation-fill-mode: forwards;
             width: 100%;
             transition: .2s;
+            background-color: $msgs--background--color;
+            border-right: none;
     
             @keyframes inputEntry {
                 0% {
@@ -46,7 +51,7 @@
         }
 
         .div__to__animate {
-            background-color: rgb(133, 0, 0);
+            background-color: $sending--msg--animate--color;
             height: auto;
             width: 0;
         }
@@ -68,8 +73,8 @@
                 right: 0;
                 transform: translate(0%, -50%);
                 z-index: 1;
-                border-bottom: 3px solid rgb(133, 0, 0);
-                border-top: 3px solid rgb(133, 0, 0);
+                border-bottom: 3px solid $sending--msg--border--color;
+                border-top: 3px solid $sending--msg--border--color;
                 animation-name: sendMessage;
                 animation-duration: .5s;
                 animation-iteration-count: 1;

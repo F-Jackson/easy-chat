@@ -1,57 +1,23 @@
-$from-position-animation: 0px;
+@import "styles/variables.module.scss";
+
+
+$FromPositionAnimation: 0px;
 
 .message {
-    margin: 0;
-    width: 100%;
-    max-width: 300px;
-    padding: 0;
-    border: solid transparent 2px;
-
-    &--sendedNow {
-        animation-name: entry;
-        animation-duration: 1s;
-        animation-iteration-count: 1;
-        animation-fill-mode: forwards;
-    
-    
-        @keyframes entry {
-            0% {
-                width: 100%;
-            }
-            1% {
-                width: 0%;
-            }
-            100% {
-                width: 100%;
-            }
-        }
-    }
-
-    &--notSendedNow {
-        animation-name: entry;
-        animation-duration: .5s;
-        animation-iteration-count: 1;
-        animation-fill-mode: forwards;
-
-        @keyframes entry {
-            0% {
-                transform: translateX(var(--from-position-animation));
-            }
-            100% {
-                transform: translateX(0px);
-            }
-        }
-    }
+    display: grid;
+    grid-template-columns: 1fr 35px;
+    position: relative;
+    z-index: 2;
 
     &__text {
         margin: 0;
         font-size: 16px;
         padding: 5px;
         padding-bottom: 25px;
-        border-radius: 8px;
         overflow: hidden;
         overflow-wrap: break-word;
         text-align: left;
+        min-height: 18px;
         z-index: 3;
     }
 
@@ -59,25 +25,46 @@ $from-position-animation: 0px;
         width: 100%;
         padding: 0px;
         margin: 0px;
-        background-color: transparent;
-        border: none;
-        position: relative;
-        z-index: 1;
         overflow: hidden;
-        border-radius: 8px;
 
-        .trash {
-            bottom: 0;
-            right: 0;
-            position: absolute;
-            color: white;
-            transform: scale(1.1);
-            background-color: rgb(133, 0, 0);
-            padding: 3px;
-            border-radius: 5px 0 0 5px;
+        .notifications__details {
+            width: 100%;
+            padding: 5px;
+            position: relative;
             z-index: 2;
-            right: -200px;
-            transition: .25s;
+            display: grid;
+            align-content: center;
+            grid-template-columns: auto 1fr 2fr;
+            column-gap: 10px;
+            border-bottom-width: 3px;
+            border-bottom-style: solid;
+    
+            .eye {
+                color: $eye--not-vizualized;
+                grid-column: 1 / 2;
+                height: 15px;
+                width: 15px;
+            }
+    
+            .date {
+                grid-column: 2 / 3;
+            }
+    
+            .trash {
+                bottom: 0;
+                position: absolute;
+                color: $delete--color;
+                transform: scale(1.1) translateX(-25%);
+                background-color: $delete--background--color;
+                padding: 3px;
+                border-radius: 5px 0 0 0;
+                z-index: 4;
+                right: -200px;
+                transition: .25s;
+                grid-column: 3 / 4;
+                height: 15px;
+                width: 15px;
+            }
         }
     }
 

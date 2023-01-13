@@ -1,16 +1,17 @@
+@import "styles/variables.module.scss";
+
 .button {
     height: 35px;
     min-width: 35px;
     padding: 3px 5px;
 
-    background-color: rgb(133, 0, 0);
-    border: 2px solid rgb(133, 0, 0);
-    color: white;
+    background-color: $button--background--color;
+    border: 2px solid $button--border--color;
+    color: $button--color;
     font-size: 16px;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 4px;
     overflow: hidden;
     transition: .1s;
     cursor: pointer;

@@ -8,6 +8,7 @@ import { IChat, TChats, chatAtom } from "../../../../States/chats";
 import { chatSelectedAtom } from "../../../../States/chatsSelected";
 import { messagesSelectedAtom } from "../../../../States/messagesSelected";
 import { inputMessagesAtom } from "../../../../States/inputMessage";
+import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
 
 
 type ILastMessage = {
@@ -23,10 +24,13 @@ export default function ApiRefresh() {
     const [chatsState, setChatsState] = useRecoilState(chatAtom);
     const [chatSelectedState, setChatSelectedState] = useRecoilState(chatSelectedAtom);
     const setMessagesSelectedState = useSetRecoilState(messagesSelectedAtom);
-    const setInputMessagesState = useSetRecoilState(inputMessagesAtom);
+    const [inputMessagesState, setInputMessagesState]= useRecoilState(inputMessagesAtom);
+    const [apiLoadingStatusState, setApiLoadingStatusState] = useRecoilState(apiLoadingStatusAtom);
 
 
     function _Error(error: any) {
+        setApiLoadingStatusState(false);
+
         if('response' in error && 'error' in error.response.data) {
             setErrorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
         } else {
@@ -35,12 +39,17 @@ export default function ApiRefresh() {
     }
 
     function _getMessages(lastMessageDate: Date) {
+        if(apiLoadingStatusState) return;
+        setApiLoadingStatusState(true);
+
         axios.get(`http://127.0.0.1:8000/messages/chat/${messagesInfoState.chatId}/page:1/`, {
             headers: {
                 'token': jwtToken
             }
         }).then(response => {
+            setApiLoadingStatusState(false);
             setJwtToken(response.data['token']);
+            
             const messages: TMessage[] = response.data['messages'].map((msg: TMessage) => (
                 {
                     id: msg.id,
@@ -107,31 +116,56 @@ export default function ApiRefresh() {
         }
     }
 
-    function _GetChats() {
+    function _GetChats(lastMessagesIds: number[]) {
+        if(apiLoadingStatusState) return;
+        setApiLoadingStatusState(true);
+
         setMessagesSelectedState([]);
+
+        function setNewChats(data: any) {
+            const oldChats  = chatsState?.filter(chat => lastMessagesIds.includes(chat.id));
+            const oldChatsIds = oldChats?.map(chat => chat.id);
+
+            const responseChats: TChats = data.map((chat: { id: any; user_1: string; user_2: string; last_message: Date }) => {
+                return {
+                    id: chat.id,
+                    user_1: chat.user_1,
+                    user_2: chat.user_2,
+                    lastMessageDate: new Date(chat.last_message),
+                    hasNewMsg: true
+                }
+            });
+            const newChats = responseChats.filter(chat => !oldChatsIds?.includes(chat.id));
+
+            if(oldChats) {
+                setChatsState([...oldChats, ...newChats]);
+            } else {
+                setChatsState([...newChats]);
+            }
+        };
+
+        function setInputMessages() {
+            const oldInputs = inputMessagesState.filter(input => lastMessagesIds.includes(input.chatId));
+            const oldInputsIds = inputMessagesState.map(input => input.chatId);
+
+            const lastMsgs = lastMessagesIds.filter(lastMsgId => !oldInputsIds.includes(lastMsgId));
+            const newInputs = lastMsgs.map(lastMsgId => ({
+                chatId: lastMsgId,
+                message: ""
+            }));
+
+            setInputMessagesState([...oldInputs, ...newInputs]);
+        }
     
         axios.get('http://127.0.0.1:8000/chats/', {
             headers: {
                 'token': jwtToken
             }
         }).then(response => {
-            const chats: TChats = response.data['chats'].map((chat: { id: any; user_1: string; user_2: string; last_message: Date }) => {
-                return {
-                    id: chat.id,
-                    user_1: chat.user_1,
-                    user_2: chat.user_2,
-                    lastMessageDate: new Date(chat.last_message),
-                    hasNewChat: false
-                }
-            });
-            setChatsState((_) => chats);
+            setApiLoadingStatusState(false);
+            setNewChats(response.data['chats']);
 
-            setInputMessagesState((_) => chats.map(chat => {
-                return {
-                    chatId: chat.id,
-                    message: ""
-                }
-            }));
+            setInputMessages();
 
             setJwtToken((_) => response.data['token']);
         }).catch(error => {
@@ -211,7 +245,7 @@ export default function ApiRefresh() {
 
         if(chatsIds) {
             const chatsStateChanged = _verifyUseStateChanged(chatsIds, lastMessagesIds);
-            if(chatsStateChanged) _GetChats();
+            if(chatsStateChanged) _GetChats(lastMessagesIds);
         }
 
         const newSelectedChats = chatSelectedState?.filter(chatId => lastMessagesIds.includes(chatId));
@@ -220,11 +254,15 @@ export default function ApiRefresh() {
     }
 
     function getLastMessages() {
+        // if(apiLoadingStatusState) return;
+        // setApiLoadingStatusState(true);
+
         axios.get('http://127.0.0.1:8000/last-messages', {
             headers: {
                 'token': jwtToken
             }
         }).then(response => {
+            // setApiLoadingStatusState(false);
             setJwtToken(response.data['token']);
 
             let lastMessages: ILastMessage[] = response.data['last_messages'];
