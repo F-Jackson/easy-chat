@@ -1,13 +1,14 @@
 import rsa
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.forms import forms
 from rest_framework import status
 from rest_framework.response import Response
 
 from chat.constants.messages import PAGINATION_SIZE
 from chat.logic._common import request_data_field, send_error
 from chat.models import MessagesModel, ChatModel
-from chat.serializers import MessageSerializer, MessageCreateSerializer
+from chat.serializers import MessageSerializer, MessageCreateSerializer, SMessages
 
 
 def get_chat_messages(data: dict, user: User, chat_id: int, page: int) -> Response:
@@ -29,7 +30,9 @@ def get_chat_messages(data: dict, user: User, chat_id: int, page: int) -> Respon
 
         messages_data = _get_messages_data(messages, priv_key)
 
-        data.update({'messages': messages_data})
+        new_data = SMessages(messages_data, many=True).data
+
+        data.update({'messages': new_data})
 
         return Response(data, status=status.HTTP_200_OK)
 
@@ -50,7 +53,8 @@ def _get_messages_data(messages: list[MessagesModel], priv_key) -> list[dict]:
             'id': msg.pk,
             'user': getattr(msg, 'user').username,
             'message': message,
-            'date': getattr(msg, 'date')
+            'date': getattr(msg, 'date'),
+            'file': getattr(msg, 'file')
         }
 
         data.append(new_data)
@@ -60,12 +64,13 @@ def _get_messages_data(messages: list[MessagesModel], priv_key) -> list[dict]:
 
 def create_message(data: dict, request_data: dict, user: User) -> Response:
     try:
-        request_data_field(request_data, 'chat', int)
+        request_data_field(request_data, 'chat', str)
         request_data_field(request_data, 'message', str)
 
-        chat = ChatModel.objects.get(pk=request_data['chat'])
+        chat = ChatModel.objects.get(pk=int(request_data['chat']))
 
         _verify_owner(user, chat)
+
     except ValueError as e:
         return send_error(data, 'Request needs chat id and a message', status.HTTP_400_BAD_REQUEST)
     except ChatModel.DoesNotExist as e:
@@ -78,7 +83,7 @@ def create_message(data: dict, request_data: dict, user: User) -> Response:
         serializer_to_valid = _valid_serializer(user, chat, message)
 
         if serializer_to_valid.is_valid():
-            return _create_message_in_db(data, chat, message, user)
+            return _create_message_in_db(data, chat, message, user, request_data)
 
         return send_error(data, serializer_to_valid.errors, status.HTTP_400_BAD_REQUEST)
 
@@ -105,23 +110,34 @@ def _valid_serializer(user: User, chat: ChatModel, message: bytes) -> MessageSer
     return serializer
 
 
-def _create_message_in_db(data: dict, chat: ChatModel, message: bytes, user: User) -> Response:
-    msg = MessagesModel.objects.create(
-        user=user,
-        chat=chat,
-        message=message,
-        date=timezone.now()
-    )
+def _create_message_in_db(data: dict, chat: ChatModel, message: bytes, user: User, request_data: dict) -> Response:
+    try:
+        data_to_create = {
+            'user': user,
+            'chat': chat,
+            'message': message,
+            'date': timezone.now()
+        }
 
-    msg.save()
+        msg = MessagesModel.objects.create(**data_to_create)
+    except forms.ValidationError as e:
+        return Response(f'db error', status.HTTP_401_UNAUTHORIZED)
+    except Exception as e:
+        return send_error(data, str(e), status.HTTP_406_NOT_ACCEPTABLE)
+    else:
+        msg.save()
+        
+        if 'file' in request_data:
+            msg.file = request_data['file']
+            msg.save()
 
-    data['message'] = MessageCreateSerializer(msg).data
+        data['message'] = MessageCreateSerializer(msg).data
 
-    chat.last_message = msg.date
+        chat.last_message = msg.date
 
-    chat.save()
+        chat.save()
 
-    return Response(data, status=status.HTTP_201_CREATED)
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
 def detroy_message(data: dict, user: User, request_data: dict):
@@ -138,6 +154,7 @@ def detroy_message(data: dict, user: User, request_data: dict):
             chat.last_message = timezone.now()
 
             chat.save()
+            msg.file.delete()
             msg.delete()
 
         return Response(data, status=status.HTTP_200_OK)

@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
+from chat.constants.messages import ACCEPT_FILES_TYPES, ACCEPT_FILES_SIZE
 from chat.logic._common import invalid_token
 from chat.logic.chat import get_chat_info, create_new_chat, destroy_chat
 from chat.logic.last_message import get_all_last_messages
@@ -108,6 +109,10 @@ class MessagesView(APIView):
                               type=openapi.TYPE_NUMBER, required=True),
             openapi.Parameter("message", openapi.IN_QUERY, description="Message that you want to send",
                               type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter("file", openapi.IN_QUERY, description=f"File to upload, "
+                                                                    f"supported types: {ACCEPT_FILES_TYPES}, "
+                                                                    f"max size: {ACCEPT_FILES_SIZE} bytes",
+                              type=openapi.TYPE_FILE, required=False),
         ],
         responses={
             200: openapi.Response("Retrives new client token and message info", MessageCreateSerializer),
@@ -198,7 +203,7 @@ class LastMessagesView(ViewSet):
             200: openapi.Response("Retrives new client token and a list of Last Messages", LastMessagesSerializer),
         }
     )
-    def list(self, request) -> Response:
+    def create(self, request) -> Response:
         jwt_is_valid = verify_user_auth(request, True)
 
         if jwt_is_valid:
@@ -207,5 +212,5 @@ class LastMessagesView(ViewSet):
             data = {
                 'token': token
             }
-            return get_all_last_messages(data, user)
+            return get_all_last_messages(data, user, request.data)
         return invalid_token()
