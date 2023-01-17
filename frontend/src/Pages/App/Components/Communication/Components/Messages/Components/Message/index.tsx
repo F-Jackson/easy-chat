@@ -6,19 +6,32 @@ import { BiTrash } from "react-icons/bi";
 import { GoEye } from "react-icons/go";
 import variables from 'styles/_variables.module.scss';
 import classNames from "classnames";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { baseUrl } from "Constants/baseUrl";
+import uniqid from "uniqid";
+import Files from "./Components/Files";
 
+
+type TFile = {
+    fileLink: string | undefined,
+    fileType: string | undefined
+}
 
 interface Props {
     id: number,
     message?: string,
     owner: 'you' | 'other',
     sendedNow: boolean,
-    date: Date
+    date: Date,
+    fileLink?: string
+    fileType?: string,
+    fileObj?: File | Blob
 }
 
 export default function Message(props: Props) {
     const [messagesSelectedState, setMessagesSelectedState] = useRecoilState(messagesSelectedAtom);
+    const [file, setFile] = useState<TFile>({fileLink: undefined, fileType: undefined});
+    const [filesKey, setFilesKey] = useState("");
 
     function HandleClick() {
         const newMessages = messagesSelectedState.filter(msgId => msgId !== props.id);
@@ -60,6 +73,26 @@ export default function Message(props: Props) {
         return `now`;
     }
 
+    useEffect(() => {
+        if(props.fileObj !== undefined && props.fileObj !== null) {
+            setFile({
+                fileLink: URL.createObjectURL(props.fileObj),
+                fileType: props.fileType
+            });
+            return;
+        }
+
+        if(props.fileLink !== undefined && props.fileLink !== null && props.fileType !== undefined && props.fileType !== null) {
+            setFile({
+                fileLink: `${baseUrl}${props.fileLink}`,
+                fileType: props.fileType
+            });
+        }
+    }, [props.fileLink, props.fileObj, props.fileType, setFile]);
+
+    useEffect(() => {
+        setFilesKey(`${uniqid()}${file.fileLink}`);
+    }, [file]);
 
     return (
         <Selectable
@@ -80,6 +113,15 @@ export default function Message(props: Props) {
             >
                 { props.message }
             </p>
+            {
+                file.fileLink !== undefined && file.fileLink !== null && file.fileType !== undefined && file.fileType !== null ? 
+                <div key={filesKey}>
+                    <Files
+                        fileLink={file.fileLink}
+                        fileType={file.fileType}
+                    />
+                </div> : <></>
+            }
             <div 
                 className={classNames({
                     [styles.notifications__details]: true,

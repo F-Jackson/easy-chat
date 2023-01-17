@@ -8,6 +8,7 @@ import axios from "axios";
 import { errorAtom } from "../../../../../../States/error";
 import classNames from "classnames";
 import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
+import { baseUrl } from "Constants/baseUrl";
 
 
 interface Props {
@@ -54,7 +55,7 @@ export default function Messages(props: Props) {
         if(apiLoadingStatusState) return;
         setApiLoadingStatusState(true);
 
-        axios.get(`http://127.0.0.1:8000/messages/chat/${messagesInfoState.chatId}/page:${pageState}/`, {
+        axios.get(`${baseUrl}/messages/chat/${messagesInfoState.chatId}/page:${pageState}/`, {
             headers: {
                 'token': jwtToken
             }
@@ -67,7 +68,8 @@ export default function Messages(props: Props) {
                     user: msg.user,
                     message: msg.message,
                     date: new Date(msg.date),
-                    sendedNow: true
+                    sendedNow: true,
+                    file: msg.file
                 }
             )).reverse();
 
@@ -149,6 +151,9 @@ export default function Messages(props: Props) {
                             owner={message.user === userUsernameState ? "you" : "other"}
                             sendedNow={message.sendedNow}
                             date={message.date}
+                            fileLink={message.file.link}
+                            fileType={message.file.type}
+                            fileObj={message.file.obj}
                         />
                     </li>
                 ))

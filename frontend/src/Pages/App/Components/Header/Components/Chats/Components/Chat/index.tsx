@@ -13,6 +13,7 @@ import { chatAtom } from "../../../../../../../../States/chats";
 import variables from 'styles/_variables.module.scss';
 import classNames from "classnames";
 import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
+import { baseUrl } from "Constants/baseUrl";
 
 
 interface Props {
@@ -70,7 +71,7 @@ export default function Chat(props: Props) {
 
         setMessagesSelectedState([]);
 
-        axios.get(`http://127.0.0.1:8000/messages/chat/${props.id}/page:1/`, {
+        axios.get(`${baseUrl}/messages/chat/${props.id}/page:1/`, {
             headers: {
                 'token': jwtToken
             }
@@ -84,10 +85,11 @@ export default function Chat(props: Props) {
                     user: msg.user,
                     message: msg.message,
                     date: new Date(msg.date),
-                    sendedNow: false
+                    sendedNow: false,
+                    file: msg.file
                 }
             ));
-            
+
             setJwtToken(response.data['token']);
 
             setMessagesInfoState((_) => {

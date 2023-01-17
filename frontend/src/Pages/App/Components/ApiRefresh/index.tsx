@@ -9,6 +9,7 @@ import { chatSelectedAtom } from "../../../../States/chatsSelected";
 import { messagesSelectedAtom } from "../../../../States/messagesSelected";
 import { inputMessagesAtom } from "../../../../States/inputMessage";
 import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
+import { baseUrl } from "Constants/baseUrl";
 
 
 type ILastMessage = {
@@ -42,7 +43,7 @@ export default function ApiRefresh() {
         if(apiLoadingStatusState) return;
         setApiLoadingStatusState(true);
 
-        axios.get(`http://127.0.0.1:8000/messages/chat/${messagesInfoState.chatId}/page:1/`, {
+        axios.get(`${baseUrl}/messages/chat/${messagesInfoState.chatId}/page:1/`, {
             headers: {
                 'token': jwtToken
             }
@@ -56,7 +57,8 @@ export default function ApiRefresh() {
                     user: msg.user,
                     message: msg.message,
                     date: new Date(msg.date),
-                    sendedNow: false
+                    sendedNow: false,
+                    file: msg.file
                 }
             )).reverse();
 
@@ -157,7 +159,7 @@ export default function ApiRefresh() {
             setInputMessagesState([...oldInputs, ...newInputs]);
         }
     
-        axios.get('http://127.0.0.1:8000/chats/', {
+        axios.get(`${baseUrl}/chats/`, {
             headers: {
                 'token': jwtToken
             }
@@ -257,7 +259,7 @@ export default function ApiRefresh() {
         // if(apiLoadingStatusState) return;
         // setApiLoadingStatusState(true);
 
-        axios.get('http://127.0.0.1:8000/last-messages', {
+        axios.post(`${baseUrl}/last-messages/`, {test: 'test'}, {
             headers: {
                 'token': jwtToken
             }

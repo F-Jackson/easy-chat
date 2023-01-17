@@ -10,10 +10,20 @@ import { messagesAtom, messagesInfoAtom } from "../../../../../../States/message
 import { jwtTokenAtom, userUsernameAtom } from "../../../../../../States/user";
 import { inputMessagesAtom } from "../../../../../../States/inputMessage";
 import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
+import Compressor from 'compressorjs';
+import { ACCEPTEDFILEMAXSIZE, ACCEPTEDFILETYPES } from "Constants/sendMessage";
+import { baseUrl } from "Constants/baseUrl";
 
+
+type TData = {
+    chat: number,
+    message: string,
+    file?: File | Blob
+}
 
 export default function SendMessage() {
     const [messageState, setMessageState] = useState("");
+    const [fileState, setFileState] = useState<File | undefined>(undefined);
     const [sendingState, setSendingState] = useState(false);
 
     const [messagesState, setMessagesState] = useRecoilState(messagesAtom);
@@ -33,22 +43,30 @@ export default function SendMessage() {
             setSendingState(true);
 
             const message = messageState;
+            let data: TData = {
+                chat: messagesInfoState.chatId ? messagesInfoState.chatId : 0,
+                message: message,
+            }
 
-            axios.post('http://127.0.0.1:8000/messages/', {
-                'chat': messagesInfoState.chatId,
-                'message': message
-            }, {
+            if(fileState !== undefined) data.file = fileState;
+
+            axios.post(`${baseUrl}/messages/`, data, {
                 headers: {
-                    'token': jwtToken
+                    'token': jwtToken,
+                    'Content-Type': 'multipart/form-data'
                 }
             }).then(response => {
-                setApiLoadingStatusState(false);
+                setApiLoadingStatusState(false); 
                 const newMessage = {
                     id: response.data['message'].id,
                     user: userUsernameState,
                     message: message,
                     date: new Date(),
-                    sendedNow: true
+                    sendedNow: true,
+                    file: {
+                        obj: fileState ? fileState : undefined,
+                        type: fileState?.type
+                    }
                 };
 
                 setJwtToken(response.data['token']);
@@ -90,6 +108,18 @@ export default function SendMessage() {
         }
     }, [messagesState]);
 
+    function setFile(e: React.ChangeEvent<HTMLInputElement>) {
+        if(e.target.files && e.target.files.length > 0) {
+            const file: File = e.target.files[0];
+            const fileType = file.type;
+
+            if(ACCEPTEDFILETYPES.includes(fileType) && file.size <= ACCEPTEDFILEMAXSIZE) {
+                setFileState(file);
+            } else {
+                setFileState(undefined);
+            }
+        }  
+    }
 
     return (
         <section
@@ -102,6 +132,13 @@ export default function SendMessage() {
                     [styles['form--sending']]: sendingState
                 })}
             >
+                <input 
+                    type="file"
+                    name="send-file"
+                    title="Send File"
+                    onChange={(e) => setFile(e)}
+                    accept={ACCEPTEDFILETYPES.join(',')}
+                />
                 <Input 
                     type="text"
                     name="message"

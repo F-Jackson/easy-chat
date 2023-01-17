@@ -1,12 +1,19 @@
 import { atom } from "recoil";
 
 
+type TFile = {
+    link?: string,
+    type?: string,
+    obj?: Blob | File
+}
+
 type TMessage = {
     id: number,
     user: string,
     message: string,
     date: Date,
-    sendedNow: boolean
+    sendedNow: boolean,
+    file: TFile
 }
 
 interface IMessagesInfo {

@@ -27,7 +27,7 @@ class SMessages(serializers.Serializer):
     user = serializers.CharField()
     message = serializers.CharField()
     date = serializers.DateTimeField()
-    file = serializers.FileField()
+    file = serializers.DictField(child=serializers.CharField())
 
 
 class MessageCreateSerializer(serializers.ModelSerializer):

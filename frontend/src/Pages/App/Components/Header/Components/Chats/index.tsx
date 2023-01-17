@@ -13,6 +13,7 @@ import { messagesSelectedAtom } from "../../../../../../States/messagesSelected"
 import { inputMessagesAtom } from "../../../../../../States/inputMessage";
 import { TChats, chatAtom } from "../../../../../../States/chats";
 import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
+import { baseUrl } from "Constants/baseUrl";
 
 
 export default function Chats() {
@@ -64,7 +65,7 @@ export default function Chats() {
 
         setMessagesSelectedState([]);
 
-        axios.delete(`http://127.0.0.1:8000/chats/`, {
+        axios.delete(`${baseUrl}/chats/`, {
             headers: {
                 'token': jwtToken
             },
@@ -95,7 +96,7 @@ export default function Chats() {
             'talk_to': formInputState
         }
 
-        axios.post(`http://127.0.0.1:8000/chats/`, data, {
+        axios.post(`${baseUrl}/chats/`, data, {
             headers: {
                 'token': jwtToken
             }
@@ -120,7 +121,7 @@ export default function Chats() {
 
         setMessagesSelectedState([]);
 
-        axios.get('http://127.0.0.1:8000/chats/', {
+        axios.get(`${baseUrl}/chats/`, {
             headers: {
                 'token': jwtToken
             }

@@ -7,6 +7,7 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import { jwtTokenAtom, userUsernameAtom } from "../../../../../../States/user";
 import { errorAtom } from "../../../../../../States/error";
 import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
+import { baseUrl } from "Constants/baseUrl";
 
 
 interface IRequestData {
@@ -48,7 +49,7 @@ export default function UserForm() {
         if(apiLoadingStatusState) return;
         setApiLoadingStatusState(true);
 
-        axios.get('http://127.0.0.1:8000/user/', {
+        axios.get(`${baseUrl}/user/`, {
             headers: {
                 'token': jwtToken
             }
@@ -69,7 +70,7 @@ export default function UserForm() {
         if(apiLoadingStatusState) return;
         setApiLoadingStatusState(true);
 
-        axios.post('http://127.0.0.1:8000/auth/login/', data).then(response => {
+        axios.post(`${baseUrl}/auth/login/`, data).then(response => {
             setApiLoadingStatusState(false);
             _GetUserUsername(response.data['token']);
 
@@ -83,7 +84,7 @@ export default function UserForm() {
         if(apiLoadingStatusState) return;
         setApiLoadingStatusState(true);
 
-        axios.post('http://127.0.0.1:8000/user/', data).then(response => {
+        axios.post(`${baseUrl}/user/`, data).then(response => {
             setApiLoadingStatusState(false);
             _Login(data);
         }).catch(error => {

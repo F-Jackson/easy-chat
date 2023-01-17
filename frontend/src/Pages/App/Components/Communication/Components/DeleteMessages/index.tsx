@@ -7,6 +7,7 @@ import { messagesAtom } from "../../../../../../States/messages";
 import { errorAtom } from "../../../../../../States/error";
 import styles from './DeleteMessages.module.scss';
 import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
+import { baseUrl } from "Constants/baseUrl";
 
 
 export default function DeleteMessages() {
@@ -30,7 +31,7 @@ export default function DeleteMessages() {
         if(apiLoadingStatusState) return;
         setApiLoadingStatusState(true);
 
-        axios.delete(`http://127.0.0.1:8000/messages/`, {
+        axios.delete(`${baseUrl}/messages/`, {
             headers: {
                 'token': jwtToken
             },

@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.forms import forms
 from rest_framework import status
 from rest_framework.response import Response
+import magic
 
 from chat.constants.messages import PAGINATION_SIZE
 from chat.logic._common import request_data_field, send_error
@@ -54,7 +55,10 @@ def _get_messages_data(messages: list[MessagesModel], priv_key) -> list[dict]:
             'user': getattr(msg, 'user').username,
             'message': message,
             'date': getattr(msg, 'date'),
-            'file': getattr(msg, 'file')
+            'file': {
+                'link': getattr(msg, 'file'),
+                'type': magic.from_file(getattr(msg, 'file'), mime=True) if getattr(msg, 'file') else None 
+            }
         }
 
         data.append(new_data)
