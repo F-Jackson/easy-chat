@@ -115,7 +115,7 @@ export default function Message(props: Props) {
             </p>
             {
                 file.fileLink !== undefined && file.fileLink !== null && file.fileType !== undefined && file.fileType !== null ? 
-                <div key={filesKey}>
+                <div key={filesKey} className={styles.file}>
                     <Files
                         fileLink={file.fileLink}
                         fileType={file.fileType}

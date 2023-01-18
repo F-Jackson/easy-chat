@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import styles from "./Button.module.scss";
 import classNames from "classnames";
 
@@ -8,7 +8,8 @@ interface Props {
     title: string,
     children?: React.ReactNode,
     onClick?: () => void,
-    animate: boolean
+    animate: boolean,
+    newStyle?: React.CSSProperties
 }
 
 export default function Button(props: Props) {
@@ -29,8 +30,6 @@ export default function Button(props: Props) {
     }
 
 
-
-
     return (
         <button
             type={props.type}
@@ -45,6 +44,7 @@ export default function Button(props: Props) {
                 [styles.button]: true,
                 [styles['button--clicked']]: clickedState
             })}
+            style={props.newStyle}
         >
             {props.children}
         </button>

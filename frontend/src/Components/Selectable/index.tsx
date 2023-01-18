@@ -39,13 +39,13 @@ export default function Selectable(props: Props) {
 
 
     return (
-        <button
+        <div
             {...backspaceLongPress}
             title={props.title}
             className={props.className}
             style={props.newStyles}
         >
             {props.children}
-        </button>
+        </div>
     );
 }

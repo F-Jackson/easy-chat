@@ -1,0 +1,31 @@
+$type--background--color: red;
+
+
+.file {
+    display: grid;
+    width: 100%;
+    grid-template-columns: auto 1fr;
+    align-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 0px;
+    padding: 5px;
+    column-gap: 5px;
+
+    .icon {
+        &__image {
+            width: 40px;
+            height: 40px;
+        }
+        &__type {
+            margin: 0;
+            background-color: $type--background--color;
+            color: white;
+            padding: 4px 7px;
+        }
+    }
+
+    .name {
+        margin: 0;
+    }
+}

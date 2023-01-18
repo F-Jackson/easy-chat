@@ -1,0 +1,95 @@
+@import "styles/variables.module.scss";
+
+$arrows--borders: 2px solid;
+$arrows--borders--color: $input--border--color; 
+
+.expand {
+    padding: 0px;
+    margin: 0;
+    border: none;
+    background-color: transparent;
+    overflow: hidden;
+    height: auto;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    transition: all .75s;
+
+    &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.15);
+        z-index: 3;
+    }
+
+    &:hover {
+        &::after {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .expand__icons {
+            gap: 10%;
+
+            svg {
+                width: 30px;
+                height: 30px;
+            }
+        }
+    }
+
+    .expand__icons {
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 0%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        z-index: 4;
+
+        svg {
+            color: white;
+            width: 22px;
+            height: 22px;
+            padding: 5px;
+        }
+
+        .arrow1 {
+            justify-self: flex-end;
+            align-self: flex-end;
+            border-top: $arrows--borders;
+            border-left: $arrows--borders;
+            border-color: $arrows--borders--color;
+        }
+
+        .arrow2 {
+            justify-self: flex-start;
+            align-self: flex-end;
+            border-top: $arrows--borders;
+            border-right: $arrows--borders;
+            border-color: $arrows--borders--color;
+        }
+
+        .arrow3 {
+            justify-self: flex-end;
+            align-self: flex-start;
+            border-bottom: $arrows--borders;
+            border-left: $arrows--borders;
+            border-color: $arrows--borders--color;
+        }
+
+        .arrow4 {
+            justify-self: flex-start;
+            align-self: flex-start;
+            border-bottom: $arrows--borders;
+            border-right: $arrows--borders;
+            border-color: $arrows--borders--color;
+        }
+    }
+}
