@@ -12,6 +12,25 @@ from chat.models import MessagesModel, ChatModel
 from chat.serializers import MessageSerializer, MessageCreateSerializer, SMessages
 
 
+def _set_chat_has_new(chat: ChatModel, user: User, has_new: bool = True):
+    if user == chat.user_1_id:
+        chat.user_2_has_new = has_new
+    else:
+        chat.user_1_has_new = has_new
+
+    chat.save()
+
+
+def _set_chat_visualized(chat: ChatModel, user: User, save: bool = True):
+    if user == chat.user_1_id:
+        chat.user_2_visualized = timezone.now()
+    else:
+        chat.user_1_visualized = timezone.now()
+
+    if save:
+        chat.save()
+
+
 def get_chat_messages(data: dict, user: User, chat_id: int, page: int) -> Response:
     try:
         chat = ChatModel.objects.get(pk=chat_id)
@@ -27,7 +46,7 @@ def get_chat_messages(data: dict, user: User, chat_id: int, page: int) -> Respon
         priv_key = getattr(chat, 'priv_key')
         current_pages = page * PAGINATION_SIZE
 
-        messages = MessagesModel.objects.filter(chat=chat).order_by('-date')[current_pages - PAGINATION_SIZE:current_pages]
+        messages = MessagesModel.objects.filter(delete=False, chat=chat).order_by('-date')[current_pages - PAGINATION_SIZE:current_pages]
 
         messages_data = _get_messages_data(messages, priv_key)
 
@@ -35,6 +54,14 @@ def get_chat_messages(data: dict, user: User, chat_id: int, page: int) -> Respon
 
         data.update({'messages': new_data})
 
+        if chat.user_1_id == user:
+            chat.user_1_has_new = False
+        else:
+            chat.user_2_has_new = False
+        chat.save()
+
+        _set_chat_visualized(chat, user)
+        
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -56,10 +83,13 @@ def _get_messages_data(messages: list[MessagesModel], priv_key) -> list[dict]:
             'message': message,
             'date': getattr(msg, 'date'),
             'file': {
-                'link': getattr(msg, 'file'),
-                'type': magic.from_file(getattr(msg, 'file'), mime=True) if getattr(msg, 'file') else None 
+                'link': getattr(msg, 'file').url if getattr(msg, 'file') else None,
+                'type': magic.from_file(getattr(msg, 'file').path, mime=True) if getattr(msg, 'file') else None
             }
         }
+
+        msg.sended_now = False
+        msg.save()
 
         data.append(new_data)
 
@@ -129,17 +159,16 @@ def _create_message_in_db(data: dict, chat: ChatModel, message: bytes, user: Use
     except Exception as e:
         return send_error(data, str(e), status.HTTP_406_NOT_ACCEPTABLE)
     else:
+        msg.sended_now = True
         msg.save()
-        
+
         if 'file' in request_data:
             msg.file = request_data['file']
             msg.save()
 
         data['message'] = MessageCreateSerializer(msg).data
 
-        chat.last_message = msg.date
-
-        chat.save()
+        _set_chat_has_new(chat, user)
 
         return Response(data, status=status.HTTP_201_CREATED)
 
@@ -154,11 +183,9 @@ def detroy_message(data: dict, user: User, request_data: dict):
     else:
         for msg in messages:
             chat = msg.chat
+            _set_chat_has_new(chat, user)
 
-            chat.last_message = timezone.now()
-
-            chat.save()
-            msg.file.delete()
-            msg.delete()
+            msg.delete = True
+            msg.save()
 
         return Response(data, status=status.HTTP_200_OK)

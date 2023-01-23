@@ -28,12 +28,13 @@ export default function ExpandedFile() {
                 {
                     component: undefined,
                     type: '',
-                    src: ''
+                    src: '',
+                    id: 0
                 }
             ))} newStyle={newStyle} title={"Close fullscreen"} animate={true}>X</Button>
             {
                 extend ?
-                <Files fileLink={expandedFile.src} fileType={expandedFile.type} controls={true} expands={false}/> :
+                <Files fileLink={expandedFile.src} fileType={expandedFile.type} controls={true} expands={false} id={expandedFile.id}/> :
                 <></>
             }
         </div>

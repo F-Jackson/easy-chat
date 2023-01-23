@@ -9,7 +9,8 @@ interface Props {
     children: ReactNode,
     type: string,
     src: string,
-    expands?: boolean
+    expands?: boolean,
+    id: number
 }
 
 export default function ExpandFile(props: Props) {
@@ -20,7 +21,8 @@ export default function ExpandFile(props: Props) {
             {
                 component: props.children,
                 src: props.src,
-                type: props.type
+                type: props.type,
+                id: props.id
             }
         ));
     }

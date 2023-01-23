@@ -4,17 +4,17 @@ import ExpandFile from '../ExpandFile';
 interface Props {
     file: string,
     type: string,
-    expands?: boolean
+    expands?: boolean,
+    id: number
 }
 
 export default function FileImage(props: Props) {
     const newStyle = {
-        width: 'max-content',
-        height: '100%'
+        maxWidth: '100%'
     } as React.CSSProperties
 
     return (
-        <ExpandFile type={props.type} src={props.file} expands={props.expands}>
+        <ExpandFile type={props.type} src={props.file} expands={props.expands} id={props.id}>
             <img
                 src={props.file} 
                 alt="sended"

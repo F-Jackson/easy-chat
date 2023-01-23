@@ -14,12 +14,13 @@ def get_chat_info(data: dict, user: User) -> Response:
     data['chats'] = []
     for model in queryset:
         chat_id = model.pk
+        chats_has_news = model.user_1_has_new if model.user_1_id == user else model.user_2_has_new
 
         chat_data = {
             'id': chat_id,
             'user_1': model.user_1_id.username,
             'user_2': model.user_2_id.username,
-            'last_message': model.last_message
+            'has_new': chats_has_news
         }
 
         data['chats'].append(chat_data)

@@ -1,6 +1,6 @@
 const imageTypes = ['image/png', 'image/jpg', 'image/x-icon'];
 const videoTypes = ['video/mp4', ];
-const audioTypes = ['audio/mpeg', ];
+const audioTypes = ['audio/mpeg', 'audio/webm', 'video/webm'];
 const textTypes = ['application/pdf', 'text/plain'];
 
 const ACCEPTEDFILETYPES = [...imageTypes, ...videoTypes, ...audioTypes, ...textTypes];

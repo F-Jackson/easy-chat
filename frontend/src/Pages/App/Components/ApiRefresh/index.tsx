@@ -4,17 +4,21 @@ import { errorAtom } from "../../../../States/error";
 import { useEffect } from "react";
 import axios from "axios";
 import { TMessage, messagesAtom, messagesInfoAtom } from "../../../../States/messages";
-import { IChat, TChats, chatAtom } from "../../../../States/chats";
+import { IChat, TChats, chatAtom, visualizedDateAtom } from "../../../../States/chats";
 import { chatSelectedAtom } from "../../../../States/chatsSelected";
 import { messagesSelectedAtom } from "../../../../States/messagesSelected";
 import { inputMessagesAtom } from "../../../../States/inputMessage";
-import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
 import { baseUrl } from "Constants/baseUrl";
+import { expandedFileAtom } from "States/expandedFile";
+import { dateNowAtom } from "States/dateNow";
 
 
 type ILastMessage = {
-    id: number,
-    last_message: Date
+    chat_id: number,
+    has_new: boolean,
+    deleted_messages: number[],
+    new_messages: TMessage[],
+    visualized: string
 };
 
 export default function ApiRefresh() {
@@ -26,102 +30,106 @@ export default function ApiRefresh() {
     const [chatSelectedState, setChatSelectedState] = useRecoilState(chatSelectedAtom);
     const setMessagesSelectedState = useSetRecoilState(messagesSelectedAtom);
     const [inputMessagesState, setInputMessagesState]= useRecoilState(inputMessagesAtom);
-    const [apiLoadingStatusState, setApiLoadingStatusState] = useRecoilState(apiLoadingStatusAtom);
+    const setExpandedFile = useSetRecoilState(expandedFileAtom);
+    const setDateNow = useSetRecoilState(dateNowAtom);
+    const setChatVisualizedState = useSetRecoilState(visualizedDateAtom);
 
 
     function _Error(error: any) {
-        setApiLoadingStatusState(false);
-
-        if('response' in error && 'error' in error.response.data) {
+        if(error.includes('response') && error.response.data.includes('error')) {
             setErrorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
         } else {
             setErrorsState((_) => []);
         }
     }
 
-    function _getMessages(lastMessageDate: Date) {
-        if(apiLoadingStatusState) return;
-        setApiLoadingStatusState(true);
-
-        axios.get(`${baseUrl}/messages/chat/${messagesInfoState.chatId}/page:1/`, {
-            headers: {
-                'token': jwtToken
+    function _getMessages(lastMessage: ILastMessage) {
+        const newMessages = lastMessage.new_messages.map((msg: TMessage) => (
+            {
+                id: msg.id,
+                user: msg.user,
+                message: msg.message,
+                date: new Date(msg.date),
+                sendedNow: true,
+                file: msg.file
             }
-        }).then(response => {
-            setApiLoadingStatusState(false);
-            setJwtToken(response.data['token']);
-            
-            const messages: TMessage[] = response.data['messages'].map((msg: TMessage) => (
-                {
-                    id: msg.id,
-                    user: msg.user,
-                    message: msg.message,
-                    date: new Date(msg.date),
-                    sendedNow: false,
-                    file: msg.file
-                }
-            )).reverse();
-
-            const messagesIds= messages.map(msg => msg.id);
-            const oldMessages = messagesState.filter(msg => !messagesIds.includes(msg.id));
-
-            setMessagesState([...oldMessages, ...messages]);
-
-            const newMessageInfo = {
-                chatId: messagesInfoState.chatId,
-                talkingTo: messagesInfoState.talkingTo,
-                lastMessageDate: new Date(lastMessageDate)
-            } 
-
-            setMessagesInfoState(newMessageInfo);
-
-            setMessagesSelectedState((old) => (
-                old.filter(oldId => messagesIds.includes(oldId))
-            ));
-        }).catch(error => {
-            _Error(error);
-        });
+        ));
+        setMessagesState((old) => [...old, ...newMessages]);
     }
 
-    function _compareDate(lastMsg: Date, messagesLastDate: Date): boolean {
-        const day = lastMsg.getDate() <= messagesLastDate.getDate();
-        const month = lastMsg.getMonth() <= messagesLastDate.getMonth();
-        const hours = lastMsg.getHours() <= messagesLastDate.getHours();
-        const minutes = lastMsg.getMinutes() <= messagesLastDate.getMinutes();
-        const seconds = lastMsg.getSeconds() - messagesLastDate.getSeconds();
-
-        const toCompare = [month, day, hours, minutes];
-
-        for(let i=0; i<toCompare.length; i++) {
-            if(!toCompare[i]) {
-                return true;
-            };
-        }
-
-        if(Math.abs(seconds) > 2) return true;
-        return false;
+    function _deleteMessages(deletedMessages: number[]) {
+        const filteredMessages = messagesState.filter(msg => !deletedMessages.includes(msg.id));
+        setMessagesState(filteredMessages);
     }
 
     function _verifyNewMessages(lastMessages: ILastMessage[]) {
         if(messagesInfoState.chatId) {
-            const lastMsg = lastMessages.find(lastMsg => lastMsg.id === messagesInfoState.chatId);
+            const lastMsg = lastMessages.find(lastMsg => lastMsg.chat_id === messagesInfoState.chatId);
+            const messagesStateIds = messagesState.map(msg => msg.id);
 
-            if(lastMsg === undefined) return;
+            if(lastMsg !== undefined) {
+                setChatVisualizedState(new Date(lastMsg.visualized));
+                if(lastMsg.has_new) {
+                    const newMessages = lastMsg.new_messages.filter(newMsg => !messagesStateIds.includes(newMsg.id));
+                    const deletedMessages = lastMsg.deleted_messages.filter(deletedMsg => messagesStateIds.includes(deletedMsg));
+                    if(newMessages.length > 0) _getMessages(lastMsg);
+                    if(deletedMessages.length > 0) _deleteMessages(deletedMessages);
+                }
+            };
+        }
+    }
 
-            const messagesLastDate = messagesInfoState.lastMessageDate;
+    function _verifyMessageInfoState(lastMessagesIds: number[]) {
+        if(messagesInfoState.chatId) {
+            const messagesChatsIdInLastMessages = lastMessagesIds.includes(messagesInfoState.chatId);
 
-            const diferentDates = _compareDate(lastMsg.last_message, messagesLastDate);
+            if (!messagesChatsIdInLastMessages) {
+                setMessagesInfoState({
+                    chatId: undefined,
+                    talkingTo: undefined
+                });
 
-            if(!diferentDates) return;
+                setMessagesState([]);
+            }
+        };
+    }
+    
+    function _ChatsNewsMessages(lastMessages: ILastMessage[]) {
+        const difLastMsgs = chatsState?.map(chat => chat.hasNewMsg ? 1 : 0);
 
-            _getMessages(lastMsg.last_message);
+        const chats = chatsState?.map(chat => {
+            const lastMsg = lastMessages.find(lastMsg => lastMsg.chat_id === chat.id);
+            
+            if(lastMsg && messagesInfoState.chatId !== chat.id) {
+
+                if(lastMsg.has_new) {
+                    return {
+                        id: chat.id,
+                        user_1: chat.user_1,
+                        user_2: chat.user_2,
+                        hasNewMsg: true
+                    } as IChat
+                }
+            }
+            
+            return {
+                id: chat.id,
+                user_1: chat.user_1,
+                user_2: chat.user_2,
+                hasNewMsg: chat.hasNewMsg
+            } as IChat
+        });
+
+        const difNewLastMsgs = chats?.map(chat => chat.hasNewMsg ? 1 : 0);
+
+        if(difLastMsgs && difNewLastMsgs) {
+            if(_verifyUseStateChanged(difLastMsgs, difNewLastMsgs)) {
+                setChatsState((_) => chats);
+            }
         }
     }
 
     function _GetChats(lastMessagesIds: number[]) {
-        if(apiLoadingStatusState) return;
-        setApiLoadingStatusState(true);
-
         setMessagesSelectedState([]);
 
         function setNewChats(data: any) {
@@ -164,7 +172,6 @@ export default function ApiRefresh() {
                 'token': jwtToken
             }
         }).then(response => {
-            setApiLoadingStatusState(false);
             setNewChats(response.data['chats']);
 
             setInputMessages();
@@ -173,44 +180,6 @@ export default function ApiRefresh() {
         }).catch(error => {
             _Error(error);
         });
-    }
-
-    function _ChatsNewsMessages(lastMessages: ILastMessage[]) {
-        const difLastMsgs = chatsState?.map(chat => chat.hasNewMsg ? 1 : 0);
-
-        const chats = chatsState?.map(chat => {
-            const lastMsgDate = lastMessages.find(lastMsg => lastMsg.id === chat.id);
-            
-            if(lastMsgDate && messagesInfoState.chatId !== chat.id) {
-                const diferentDates = _compareDate(lastMsgDate.last_message, chat.lastMessageDate);
-
-                if(diferentDates) {
-                    return {
-                        id: chat.id,
-                        user_1: chat.user_1,
-                        user_2: chat.user_2,
-                        lastMessageDate: new Date(lastMsgDate.last_message),
-                        hasNewMsg: true
-                    } as IChat
-                }
-            }
-            
-            return {
-                id: chat.id,
-                user_1: chat.user_1,
-                user_2: chat.user_2,
-                lastMessageDate: new Date(chat.lastMessageDate),
-                hasNewMsg: chat.hasNewMsg
-            } as IChat
-        });
-
-        const difNewLastMsgs = chats?.map(chat => chat.hasNewMsg ? 1 : 0);
-
-        if(difLastMsgs && difNewLastMsgs) {
-            if(_verifyUseStateChanged(difLastMsgs, difNewLastMsgs)) {
-                setChatsState((_) => chats);
-            }
-        }
     }
 
     function _verifyUseStateChanged(oldState: number[] | boolean[], newState: number[] | boolean[]): boolean {
@@ -226,29 +195,23 @@ export default function ApiRefresh() {
         return false;
     }
 
-    function _verifyMessageInfoState(lastMessagesIds: number[]) {
-        if(messagesInfoState.chatId) {
-            const messagesChatsIdInLastMessages = lastMessagesIds.includes(messagesInfoState.chatId);
+    function _verifyChatInBackend(lastMessagesIds: number[]) {
+        let chatsIds = chatsState?.map(chat => chat.id);
+        chatsIds = chatsIds !== undefined ? chatsIds : [];
 
-            if (!messagesChatsIdInLastMessages) {
-                setMessagesInfoState({
-                    chatId: undefined,
-                    talkingTo: undefined,
-                    lastMessageDate: new Date()
+        const chatsStateChanged = _verifyUseStateChanged(chatsIds, lastMessagesIds);
+
+        if(chatsStateChanged) { 
+            _GetChats(lastMessagesIds);
+            if (messagesInfoState.chatId === undefined || !chatsIds.includes(messagesInfoState.chatId)) {
+                setExpandedFile({
+                    component: undefined,
+                    src: "",
+                    type: "",
+                    id: 0
                 });
-
-                setMessagesState([]);
             }
         };
-    }
-
-    function _verifyChatInBackend(lastMessagesIds: number[]) {
-        const chatsIds = chatsState?.map(chat => chat.id);
-
-        if(chatsIds) {
-            const chatsStateChanged = _verifyUseStateChanged(chatsIds, lastMessagesIds);
-            if(chatsStateChanged) _GetChats(lastMessagesIds);
-        }
 
         const newSelectedChats = chatSelectedState?.filter(chatId => lastMessagesIds.includes(chatId));
         const selectedChatsStateChanged = _verifyUseStateChanged(chatSelectedState, newSelectedChats);
@@ -256,25 +219,19 @@ export default function ApiRefresh() {
     }
 
     function getLastMessages() {
-        // if(apiLoadingStatusState) return;
-        // setApiLoadingStatusState(true);
-
-        axios.post(`${baseUrl}/last-messages/`, {test: 'test'}, {
+        axios.post(`${baseUrl}/last-messages/`, {chat_id: messagesInfoState.chatId}, {
             headers: {
                 'token': jwtToken
             }
         }).then(response => {
-            // setApiLoadingStatusState(false);
             setJwtToken(response.data['token']);
 
+            const now = new Date(response.data['date']);
+
+            if(now.getSeconds() % 20 === 0) setDateNow(now);
+
             let lastMessages: ILastMessage[] = response.data['last_messages'];
-            lastMessages = lastMessages.map(lastMsg => {
-                return {
-                    id: lastMsg.id,
-                    last_message: new Date(lastMsg.last_message)
-                };
-            });
-            const lastMessagesIds = lastMessages.map(lastMsg => lastMsg.id);
+            const lastMessagesIds = lastMessages.map(lastMsg => lastMsg.chat_id);
 
             _verifyChatInBackend(lastMessagesIds);
 
@@ -291,9 +248,13 @@ export default function ApiRefresh() {
     useEffect(() => {
         const interval = setInterval(() => {
             if(jwtToken) getLastMessages();
-        }, 1000);
+        }, 500);
         return () => clearInterval(interval);
     }, [messagesInfoState.chatId, jwtToken, chatsState, messagesState]);
+
+    useEffect(() => {
+        setChatVisualizedState(undefined);
+    }, [messagesInfoState.chatId])
 
     return (
         <></>

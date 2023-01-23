@@ -20,8 +20,10 @@ class ChatModel(models.Model):
         unique=False, related_name='user_2_id',
         related_query_name='user_2_id'
     )
-    last_message = models.DateTimeField(default=timezone.now)
-    visualized = models.DateTimeField(default=timezone.now)
+    user_1_visualized = models.DateTimeField(default=timezone.now)
+    user_2_visualized = models.DateTimeField(default=timezone.now)
+    user_1_has_new = models.BooleanField(default=True)
+    user_2_has_new = models.BooleanField(default=True)
 
 
 class MessagesModel(models.Model):
@@ -37,3 +39,5 @@ class MessagesModel(models.Model):
     file = ContentTypeRestrictedFileField(content_types=ACCEPT_FILES_TYPES,
                                           max_upload_size=ACCEPT_FILES_SIZE, blank=True, null=True)
     date = models.DateTimeField(default=timezone.now)
+    delete = models.BooleanField(default=False)
+    sended_now = models.BooleanField(default=True)

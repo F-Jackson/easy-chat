@@ -18,16 +18,14 @@ type TMessage = {
 
 interface IMessagesInfo {
     chatId: number | undefined,
-    talkingTo: string | undefined,
-    lastMessageDate: Date
+    talkingTo: string | undefined
 }
 
 const messagesInfoAtom = atom({
     key: "messagesInfoAtom",
     default: {
         chatId: undefined,
-        talkingTo: undefined,
-        lastMessageDate: new Date()
+        talkingTo: undefined
     } as IMessagesInfo
 });
 

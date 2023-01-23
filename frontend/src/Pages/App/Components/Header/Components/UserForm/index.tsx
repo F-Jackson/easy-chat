@@ -6,7 +6,6 @@ import axios from "axios";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { jwtTokenAtom, userUsernameAtom } from "../../../../../../States/user";
 import { errorAtom } from "../../../../../../States/error";
-import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
 import { baseUrl } from "Constants/baseUrl";
 
 
@@ -28,13 +27,13 @@ export default function UserForm() {
     const setJwtToken = useSetRecoilState(jwtTokenAtom);
     const errorsState = useSetRecoilState(errorAtom);
     const setUserUsernameState = useSetRecoilState(userUsernameAtom);
-    const [apiLoadingStatusState, setApiLoadingStatusState] = useRecoilState(apiLoadingStatusAtom);
+    const [apiLoadingStatusState, setApiLoadingStatusState] = useState(false);
 
     function _Error(error: any) {
         setApiLoadingStatusState(false);
 
         setJwtToken((_) => "");
-        if('response' in error && 'error' in error.response.data) {
+        if(error.includes('response') && error.response.data.includes('error')) {
             errorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
         } else {
             errorsState((_) => []);

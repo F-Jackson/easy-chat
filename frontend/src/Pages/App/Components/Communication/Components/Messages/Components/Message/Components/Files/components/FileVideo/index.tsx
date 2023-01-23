@@ -5,12 +5,13 @@ interface Props {
     file: string,
     type: string,
     controls?: boolean,
-    expands?: boolean
+    expands?: boolean,
+    id: number
 }
 
 export default function FileImage(props: Props) {
     return (
-        <ExpandFile type={props.type} src={props.file} expands={props.expands}>
+        <ExpandFile type={props.type} src={props.file} expands={props.expands} id={props.id}>
             <video
                 className={styles.video__container}
                 controls={props.controls ? props.controls : false}

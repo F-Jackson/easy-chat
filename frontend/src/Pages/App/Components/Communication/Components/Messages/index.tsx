@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { errorAtom } from "../../../../../../States/error";
 import classNames from "classnames";
-import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
 import { baseUrl } from "Constants/baseUrl";
 
 
@@ -21,7 +20,6 @@ export default function Messages(props: Props) {
     const messagesInfoState = useRecoilValue(messagesInfoAtom);
     const userUsernameState = useRecoilValue(userUsernameAtom);
     const setErrorsState = useSetRecoilState(errorAtom);
-    const [apiLoadingStatusState, setApiLoadingStatusState] = useRecoilState(apiLoadingStatusAtom);
 
     const [pageState, setPageState] = useState(2);
     const [reachedTopState, setReachedTopState] = useState(false);
@@ -42,9 +40,7 @@ export default function Messages(props: Props) {
     };
 
     function _Error(error: any) {
-        setApiLoadingStatusState(false);
-
-        if('response' in error && 'error' in error.response.data) {
+        if(error.includes('response') && error.response.data.includes('error')) {
             setErrorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
         } else {
             setErrorsState((_) => []);
@@ -52,15 +48,11 @@ export default function Messages(props: Props) {
     }
 
     function _GetNewMessages() {
-        if(apiLoadingStatusState) return;
-        setApiLoadingStatusState(true);
-
         axios.get(`${baseUrl}/messages/chat/${messagesInfoState.chatId}/page:${pageState}/`, {
             headers: {
                 'token': jwtToken
             }
         }).then(response => {
-            setApiLoadingStatusState(false);
             setJwtToken(response.data['token']);
             let messages: TMessage[] = response.data['messages'].map((msg: TMessage) => (
                 {

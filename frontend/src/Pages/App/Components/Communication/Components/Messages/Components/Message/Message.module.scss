@@ -8,7 +8,7 @@ $FromPositionAnimation: 0px;
     grid-template-columns: 1fr 35px;
     position: relative;
     z-index: 2;
-    cursor: pointer;
+
 
     &__text {
         margin: 0;
@@ -27,6 +27,7 @@ $FromPositionAnimation: 0px;
         padding: 0px;
         margin: 0px;
         overflow: hidden;
+        cursor: pointer;
 
         .notifications__details {
             width: 100%;
@@ -45,6 +46,10 @@ $FromPositionAnimation: 0px;
                 grid-column: 1 / 2;
                 height: 15px;
                 width: 15px;
+
+                &--visualized {
+                    color: $eye-vizualized;
+                }
             }
     
             .date {

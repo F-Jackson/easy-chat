@@ -8,7 +8,8 @@ interface Props {
     fileLink: string,
     fileType: string,
     controls?: boolean,
-    expands?: boolean
+    expands?: boolean,
+    id: number
 }
 
 
@@ -16,8 +17,8 @@ export default function Files(props: Props) {
     return (
         <>
             {
-                imageTypes.includes(props.fileType) ? <FileImage file={props.fileLink} type={props.fileType} expands={props.expands}/> 
-                : videoTypes.includes(props.fileType) ? <FileVideo file={props.fileLink} type={props.fileType} controls={props.controls} expands={props.expands}/>
+                imageTypes.includes(props.fileType) ? <FileImage file={props.fileLink} type={props.fileType} expands={props.expands} id={props.id}/> 
+                : videoTypes.includes(props.fileType) ? <FileVideo file={props.fileLink} type={props.fileType} controls={props.controls} expands={props.expands} id={props.id}/>
                 : audioTypes.includes(props.fileType) ? <FileAudio file={props.fileLink} type={props.fileType}/> 
                 : <FileCommon file={props.fileLink} type={props.fileType} />
             }

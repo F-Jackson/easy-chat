@@ -6,7 +6,8 @@ type TComponent = undefined | ReactElement | ReactNode;
 type TExpandedFile = {
     component: TComponent,
     src: string,
-    type: string
+    type: string,
+    id: number
 }
 
 const expandedFileAtom = atom({
@@ -14,7 +15,8 @@ const expandedFileAtom = atom({
     default: {
         component: undefined,
         src: "",
-        type: ""
+        type: "",
+        id: 0
     } as TExpandedFile
 });
 

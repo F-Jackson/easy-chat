@@ -13,7 +13,7 @@ class SChats(serializers.Serializer):
     id = serializers.IntegerField()
     user_1 = serializers.CharField()
     user_2 = serializers.CharField()
-    last_message = serializers.DateTimeField()
+    has_new = serializers.BooleanField()
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -36,7 +36,14 @@ class MessageCreateSerializer(serializers.ModelSerializer):
         exclude = ['message']
 
 
-class LastMessagesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ChatModel
-        fields = ['id', 'last_message']
+class _LM(serializers.Serializer):
+    chat_id = serializers.IntegerField()
+    has_new = serializers.BooleanField()
+    deleted_messages = serializers.ListField(child=serializers.IntegerField(min_value=0))
+    new_messages = SMessages(many=True)
+    visualized = serializers.DateTimeField()
+
+
+class LastMessagesSerializer(serializers.Serializer):
+    date = serializers.DateTimeField()
+    last_messages = _LM(many=True)

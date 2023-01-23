@@ -10,10 +10,9 @@ import { BiTrash } from "react-icons/bi";
 import { FaFire }  from "react-icons/fa";
 import { messagesSelectedAtom } from "../../../../../../../../States/messagesSelected";
 import { chatAtom } from "../../../../../../../../States/chats";
-import variables from 'styles/_variables.module.scss';
 import classNames from "classnames";
-import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
 import { baseUrl } from "Constants/baseUrl";
+import { expandedFileAtom } from "States/expandedFile";
 
 
 interface Props {
@@ -22,8 +21,7 @@ interface Props {
     newMessages: number,
     timerId: NodeJS.Timeout | undefined,
     setTimerId: React.Dispatch<React.SetStateAction<NodeJS.Timeout | undefined>>,
-    hasNewChat: boolean,
-    lastMessageDate: Date
+    hasNewChat: boolean
 }
 
 export default function Chat(props: Props) {
@@ -34,13 +32,11 @@ export default function Chat(props: Props) {
     const setMessagesSelectedState = useSetRecoilState(messagesSelectedAtom);
     const setMessagesInfoState = useSetRecoilState(messagesInfoAtom);
     const [chatsState, setChatsState] = useRecoilState(chatAtom);
-    const [apiLoadingStatusState, setApiLoadingStatusState] = useRecoilState(apiLoadingStatusAtom);
+    const setExpandedFile = useSetRecoilState(expandedFileAtom);
     
 
     function _Error(error: any) {
-        setApiLoadingStatusState(false);
-
-        if('response' in error && 'error' in error.response.data) {
+        if(error.includes('response') && error.response.data.includes('error')) {
             setErrorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
         } else {
             setErrorsState((_) => []);
@@ -66,9 +62,6 @@ export default function Chat(props: Props) {
     }
 
     function OpenChat() {
-        if(apiLoadingStatusState) return;
-        setApiLoadingStatusState(true);
-
         setMessagesSelectedState([]);
 
         axios.get(`${baseUrl}/messages/chat/${props.id}/page:1/`, {
@@ -76,7 +69,6 @@ export default function Chat(props: Props) {
                 'token': jwtToken
             }
         }).then(response => {
-            setApiLoadingStatusState(false);
             clearTimeout(props.timerId);
 
             const messages = response.data['messages'].map((msg: TMessage) => (
@@ -104,8 +96,7 @@ export default function Chat(props: Props) {
                 setMessagesInfoState((_) => {
                     return {
                         chatId: props.id,
-                        talkingTo: props.name,
-                        lastMessageDate: new Date(props.lastMessageDate) 
+                        talkingTo: props.name
                     };
                 });
     
@@ -118,7 +109,6 @@ export default function Chat(props: Props) {
                         id: chat.id,
                         user_1: chat.user_1,
                         user_2: chat.user_2,
-                        lastMessageDate: chat.lastMessageDate,
                         hasNewMsg: false
                     }
                 } else {
@@ -126,13 +116,19 @@ export default function Chat(props: Props) {
                         id: chat.id,
                         user_1: chat.user_1,
                         user_2: chat.user_2,
-                        lastMessageDate: chat.lastMessageDate,
                         hasNewMsg: chat.hasNewMsg
                     }
                 }
             });
 
             setChatsState(newsChats);
+
+            setExpandedFile({
+                component: undefined,
+                src: "",
+                type: "",
+                id: 0
+            });
         }).catch(error => {
             _Error(error);
         });
@@ -159,7 +155,7 @@ export default function Chat(props: Props) {
             holdTime={250}
         >
             <img 
-                src="" 
+                src={process.env.PUBLIC_URL + 'assets/img/user-icon-jpg-28.jpg'}
                 alt="UserImage" 
                 className={styles.image}
             />

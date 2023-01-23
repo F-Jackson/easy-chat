@@ -1,6 +1,6 @@
 import styles from "./Message.module.scss";
 import Selectable from "../../../../../../../../Components/Selectable";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { messagesSelectedAtom } from "../../../../../../../../States/messagesSelected";
 import { BiTrash } from "react-icons/bi";
 import { GoEye } from "react-icons/go";
@@ -10,6 +10,8 @@ import React, { useEffect, useState } from "react";
 import { baseUrl } from "Constants/baseUrl";
 import uniqid from "uniqid";
 import Files from "./Components/Files";
+import { dateNowAtom } from "States/dateNow";
+import { visualizedDateAtom } from "States/chats";
 
 
 type TFile = {
@@ -32,6 +34,9 @@ export default function Message(props: Props) {
     const [messagesSelectedState, setMessagesSelectedState] = useRecoilState(messagesSelectedAtom);
     const [file, setFile] = useState<TFile>({fileLink: undefined, fileType: undefined});
     const [filesKey, setFilesKey] = useState("");
+    const [timeState, setTimeState] = useState<string>();
+    const dateNow = useRecoilValue(dateNowAtom);
+    const chatVisualizedState = useRecoilValue(visualizedDateAtom);
 
     function HandleClick() {
         const newMessages = messagesSelectedState.filter(msgId => msgId !== props.id);
@@ -49,28 +54,45 @@ export default function Message(props: Props) {
         }
     };
 
-    function getTime(): string {
-        const now = new Date();
+    function getTime() {
+        const seconds = Math.floor((dateNow.getTime() - props.date.getTime()) / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        const mouths = dateNow.getMonth() - props.date.getMonth();
+        const years = dateNow.getFullYear() - props.date.getFullYear();
 
-        const yearDiference = now.getFullYear() - props.date.getFullYear();
-        if(yearDiference > 0) return `${yearDiference} year${yearDiference > 1 ? 's' : ''} ago`;
+        if(years > 0) {
+            setTimeState(`${years} year${years > 1 ? 's' : ''} ago`);
+            return;
+        }
+        
+        if(mouths > 0) {
+            setTimeState(`${mouths} mouth${mouths > 1 ? 's' : ''} ago`);
+            return;
+        }
 
-        const mouthDiference = now.getMonth() - props.date.getMonth();
-        if(mouthDiference > 0) return `${mouthDiference} mouth${mouthDiference > 1 ? 's' : ''} ago`;
+        if(days > 0) {
+            setTimeState(`${days} day${days > 1 ? 's' : ''} ago`); 
+            return;
+        }
 
-        const dayDiference = now.getDate() - props.date.getDate();
-        if(dayDiference > 0) return `${dayDiference} day${dayDiference > 1 ? 's' : ''} ago`;
+        if(hours > 0) {
+            setTimeState(`${hours} hour${hours > 1 ? 's' : ''} ago`);
+            return;
+        }
 
-        const hoursDiference = now.getHours() - props.date.getHours();
-        if(hoursDiference > 0) return `${hoursDiference} hour${hoursDiference > 1 ? 's' : ''} ago`;
+        if(minutes > 0) {
+            setTimeState(`${minutes} minute${minutes > 1 ? 's' : ''} ago`); 
+            return;
+        }
 
-        const minutesDiference = now.getMinutes() - props.date.getMinutes();
-        if(minutesDiference > 0) return `${minutesDiference} minute${minutesDiference > 1 ? 's' : ''} ago`;
+        if(seconds > 5) {
+            setTimeState(`${seconds} second${seconds > 1 ? 's' : ''} ago`);
+            return;
+        }
 
-        const secondsDiference = now.getSeconds() - props.date.getSeconds();
-        if(secondsDiference > 0) return `${secondsDiference} second${secondsDiference > 1 ? 's' : ''} ago`;
-
-        return `now`;
+        setTimeState(`now`);
     }
 
     useEffect(() => {
@@ -84,7 +106,7 @@ export default function Message(props: Props) {
 
         if(props.fileLink !== undefined && props.fileLink !== null && props.fileType !== undefined && props.fileType !== null) {
             setFile({
-                fileLink: `${baseUrl}${props.fileLink}`,
+                fileLink: `${baseUrl}/${props.fileLink}`,
                 fileType: props.fileType
             });
         }
@@ -93,6 +115,10 @@ export default function Message(props: Props) {
     useEffect(() => {
         setFilesKey(`${uniqid()}${file.fileLink}`);
     }, [file]);
+
+    useEffect(() => {
+        getTime();
+    }, [dateNow]);
 
     return (
         <Selectable
@@ -119,6 +145,7 @@ export default function Message(props: Props) {
                     <Files
                         fileLink={file.fileLink}
                         fileType={file.fileType}
+                        id={props.id}
                     />
                 </div> : <></>
             }
@@ -131,12 +158,12 @@ export default function Message(props: Props) {
                 <GoEye 
                     className={classNames({
                         [styles.eye]: true,
-                        [styles['eye--visualized']]: true
+                        [styles['eye--visualized']]: chatVisualizedState && chatVisualizedState?.getTime() >= props.date.getTime()
                     })}
                     style={props.owner === 'you' ? {} : {color: 'transparent'} as React.CSSProperties}
                 />
                 <span className={styles.date}>
-                    { getTime() }
+                    { timeState }
                 </span>
                 <BiTrash 
                     className={styles.trash}

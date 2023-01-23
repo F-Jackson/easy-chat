@@ -5,7 +5,6 @@ interface IChat {
     id: number,
     user_1: string,
     user_2: string,
-    lastMessageDate: Date,
     hasNewMsg: boolean
 }
 
@@ -16,5 +15,10 @@ const chatAtom = atom({
     default: [] as TChats | undefined
 });
 
-export { chatAtom }
+const visualizedDateAtom = atom({
+    key: "visualizedDateAtom",
+    default: undefined as Date | undefined
+});
+
+export { chatAtom, visualizedDateAtom }
 export type { TChats, IChat }

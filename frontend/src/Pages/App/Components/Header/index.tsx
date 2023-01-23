@@ -8,10 +8,12 @@ import classNames from "classnames";
 import { TbMessageDots } from "react-icons/tb"
 import { useRecoilValue } from "recoil";
 import { jwtTokenAtom } from "../../../../States/user";
+import { messagesInfoAtom } from "States/messages";
 
 export default function Header() {
     const [sideMenuState, setSideMenuState] = useState(false);
-
+    
+    const messagesInfoState = useRecoilValue(messagesInfoAtom);
     const jwtTokenState = useRecoilValue(jwtTokenAtom);
 
 
@@ -22,7 +24,9 @@ export default function Header() {
     return (
         <>
             <header className={styles.header}>
-                <img src="" alt="Your user"/>
+                <div className={styles.talking__to__container}>
+                    <img src={process.env.PUBLIC_URL + 'assets/img/user-icon-jpg-28.jpg'} alt={`Talking to ${messagesInfoState.talkingTo}`}/>
+                </div>
                 <Button
                     title="View your chats"
                     onClick={() => openSideMenu()}

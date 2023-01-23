@@ -12,7 +12,6 @@ import { errorAtom } from "../../../../../../States/error";
 import { messagesSelectedAtom } from "../../../../../../States/messagesSelected";
 import { inputMessagesAtom } from "../../../../../../States/inputMessage";
 import { TChats, chatAtom } from "../../../../../../States/chats";
-import { apiLoadingStatusAtom } from "States/apiLoadingStatus";
 import { baseUrl } from "Constants/baseUrl";
 
 
@@ -29,7 +28,7 @@ export default function Chats() {
     const userUsernameState = useRecoilValue(userUsernameAtom);
     const errorsState = useSetRecoilState(errorAtom);
     const setInputMessagesState = useSetRecoilState(inputMessagesAtom);
-    const [apiLoadingStatusState, setApiLoadingStatusState] = useRecoilState(apiLoadingStatusAtom);
+    const [apiLoadingStatusState, setApiLoadingStatusState] = useState(false);
 
     const bottomRef: any = useRef(null);
 
@@ -40,7 +39,7 @@ export default function Chats() {
     function _Error(error: any) {
         setApiLoadingStatusState(false);
 
-        if('response' in error && 'error' in error.response.data) {
+        if(error.includes('response') && error.response.data.includes('error')) {
             errorsState((_) => typeof error.response.data['error'] === 'string' ? [error.response.data['error']] : [...error.response.data['error']]);
         } else {
             errorsState((_) => []);
@@ -51,8 +50,7 @@ export default function Chats() {
         if(messagesInfoState.chatId && chatSelectedState.includes(messagesInfoState.chatId)) {
             setMessagesInfoState({
                 chatId: undefined,
-                talkingTo: undefined,
-                lastMessageDate: new Date()
+                talkingTo: undefined
             });
 
             setMessagesState([]);
@@ -132,7 +130,6 @@ export default function Chats() {
                     id: chat.id,
                     user_1: chat.user_1,
                     user_2: chat.user_2,
-                    lastMessageDate: new Date(chat.last_message),
                     hasNewChat: false
                 }
             });
@@ -178,7 +175,6 @@ export default function Chats() {
                             timerId={timerId}
                             setTimerId={setTimerId}
                             hasNewChat={chat.hasNewMsg}
-                            lastMessageDate={chat.lastMessageDate}
                         />
                     </li>
                 )) }

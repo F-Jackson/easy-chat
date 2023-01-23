@@ -16,11 +16,15 @@ export default function FileCommon(props: Props) {
         return SText.slice(1);
     }
 
+    const newTypeStyle = {
+        backgroundColor: props.type === 'application/pdf' ? 'red' : 'green'
+    }
+
     return (
         <button onClick={() => window.open(`${baseUrl}/media/${getFileName()}`)} className={styles.file}>
             <div className={styles.icon}>
                 <FaFileAlt className={styles.icon__image}/>
-                <p className={styles.icon__type}>{props.type}</p>
+                <p className={styles.icon__type} style={newTypeStyle}>{props.type}</p>
             </div>
             <p className={styles.name}>{getFileName()}</p>
         </button>
