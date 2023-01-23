@@ -1,7 +1,6 @@
 # Easy-Chat-V1
 
-![](https://github.com/F-Jackson/easy-chat/read-me-imgs/read-me-imgs/blob/main/Screenshot_6.png)
-
+![](https://github.com/F-Jackson/easy-chat/blob/main/read-me-imgs/Screenshot_6.png)
 Easy-Chat is a project where you can register and send encrypted messages to other users.
 
 [Project Live Demo >>>](https://easy-chat-lyart.vercel.app/#readme)
@@ -64,18 +63,18 @@ python manage.py runserver
 ## Usage
 
 Create your user
-![](https://github.com/F-Jackson/easy-chat/read-me-imgs/blob/main/Screenshot_1.png)<br>
+![](https://github.com/F-Jackson/easy-chat/blob/main/read-me-imgs/Screenshot_1.png)<br>
 
 Find a user and add new chat
-![](https://github.com/F-Jackson/easy-chat/read-me-imgs/blob/main/Screenshot_2.png)<br>
+![](https://github.com/F-Jackson/easy-chat/blob/main/read-me-imgs/Screenshot_2.png)<br>
 
 Select the chat
-![](https://github.com/F-Jackson/easy-chat/read-me-imgs/blob/main/Screenshot_3.png)<br>
+![](https://github.com/F-Jackson/easy-chat/blob/main/read-me-imgs/Screenshot_3.png)<br>
 
 Send Messages, files and audios
-![](https://github.com/F-Jackson/easy-chat/read-me-imgs/blob/main/Screenshot_4.png)<br>
-![](https://github.com/F-Jackson/easy-chat/read-me-imgs/blob/main/Screenshot_5.png)<br>
-![](https://github.com/F-Jackson/easy-chat/read-me-imgs/blob/main/Screenshot_6.png)
+![](https://github.com/F-Jackson/easy-chat/blob/main/read-me-imgs/Screenshot_4.png)<br>
+![](https://github.com/F-Jackson/easy-chat/blob/main/read-me-imgs/Screenshot_5.png)<br>
+![](https://github.com/F-Jackson/easy-chat/blob/main/read-me-imgs/Screenshot_6.png)
 
 Have Fun
 
