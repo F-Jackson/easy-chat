@@ -1,6 +1,7 @@
 # Easy-Chat-V1
 
-![](https://github.com/F-Jackson/easy-chat/blob/main/read-me-imgs/Screenshot_6.png)
+![](https://github.com/F-Jackson/easy-chat/blob/main/read-me-imgs/Screenshot_6.png)<br>
+
 Easy-Chat is a project where you can register and send encrypted messages to other users.
 
 [Project Live Demo >>>](https://easy-chat-lyart.vercel.app/#readme)
